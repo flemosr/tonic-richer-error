@@ -1,7 +1,7 @@
 use prost::{DecodeError, EncodeError, Message};
 use prost_types::Any;
 
-use super::{pb, FromAny, ToAny};
+use super::{pb, FromAny, IntoAny};
 
 #[derive(Debug)]
 pub struct FieldViolation {
@@ -48,8 +48,8 @@ impl BadRequest {
     }
 }
 
-impl ToAny for BadRequest {
-    fn to_any(&self) -> Result<Any, EncodeError> {
+impl IntoAny for BadRequest {
+    fn into_any(&self) -> Result<Any, EncodeError> {
         let detail_data = pb::BadRequest {
             field_violations: self
                 .field_violations
@@ -95,7 +95,7 @@ impl FromAny for BadRequest {
 #[cfg(test)]
 mod tests {
 
-    use crate::{FromAny, ToAny};
+    use crate::{FromAny, IntoAny};
 
     use super::BadRequest;
 
@@ -138,7 +138,7 @@ mod tests {
             "filled BadRequest returns 'false' from .has_violations()"
         );
 
-        let gen_any = match br_details.to_any() {
+        let gen_any = match br_details.into_any() {
             Err(error) => panic!("Error generating Any from BadRequest: {:?}", error),
             Ok(gen_any) => gen_any,
         };

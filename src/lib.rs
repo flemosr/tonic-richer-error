@@ -6,13 +6,17 @@ mod pb {
     include!("./pb/google.rpc.rs");
 }
 
+mod retry_info;
+
+pub use retry_info::RetryInfo;
+
 mod bad_request;
 
 pub use bad_request::BadRequest;
 
 #[derive(Debug)]
 pub enum ErrorDetail {
-    // RetryInfo,
+    RetryInfo(RetryInfo),
     // DebugInfo,
     // QuotaFailure,
     // ErrorInfo,
@@ -24,8 +28,20 @@ pub enum ErrorDetail {
     // LocalizedMessage,
 }
 
-pub trait ToAny {
-    fn to_any(&self) -> Result<Any, EncodeError>;
+impl From<RetryInfo> for ErrorDetail {
+    fn from(err_detail: RetryInfo) -> Self {
+        ErrorDetail::RetryInfo(err_detail)
+    }
+}
+
+impl From<BadRequest> for ErrorDetail {
+    fn from(err_detail: BadRequest) -> Self {
+        ErrorDetail::BadRequest(err_detail)
+    }
+}
+
+trait IntoAny {
+    fn into_any(&self) -> Result<Any, EncodeError>;
 }
 
 trait FromAny {
@@ -38,7 +54,7 @@ pub trait WithErrorDetails {
     fn with_error_details(
         code: tonic::Code,
         message: impl Into<String>,
-        details: Vec<impl ToAny>,
+        details: Vec<ErrorDetail>,
     ) -> Result<Status, EncodeError>;
 
     fn extract_error_details(&self) -> Result<Vec<ErrorDetail>, DecodeError>;
@@ -48,14 +64,24 @@ impl WithErrorDetails for Status {
     fn with_error_details(
         code: Code,
         message: impl Into<String>,
-        details: Vec<impl ToAny>,
+        details: Vec<ErrorDetail>,
     ) -> Result<Self, EncodeError> {
         let message: String = message.into();
 
-        let conv_details: Result<Vec<Any>, EncodeError> =
-            details.iter().map(|v| v.to_any()).collect();
+        let mut conv_details: Vec<Any> = Vec::with_capacity(details.len());
 
-        let conv_details = conv_details?;
+        for error_detail in details.iter() {
+            match error_detail {
+                ErrorDetail::RetryInfo(retry_info) => {
+                    let any = retry_info.into_any()?;
+                    conv_details.push(any);
+                }
+                ErrorDetail::BadRequest(bad_req) => {
+                    let any = bad_req.into_any()?;
+                    conv_details.push(any);
+                }
+            }
+        }
 
         let status = pb::Status {
             code: code as i32,
@@ -77,6 +103,10 @@ impl WithErrorDetails for Status {
 
         for any in status.details.iter() {
             match any.type_url.as_str() {
+                RetryInfo::TYPE_URL => {
+                    let retry_info = RetryInfo::from_any(any)?;
+                    details.push(ErrorDetail::RetryInfo(retry_info));
+                }
                 BadRequest::TYPE_URL => {
                     let bad_req = BadRequest::from_any(any)?;
                     details.push(ErrorDetail::BadRequest(bad_req));
@@ -89,11 +119,44 @@ impl WithErrorDetails for Status {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     #[test]
-//     fn it_works() {
-//         let result = 2 + 2;
-//         assert_eq!(result, 4);
-//     }
-// }
+#[cfg(test)]
+mod tests {
+
+    use std::time::Duration;
+    use tonic::{Code, Status};
+
+    use super::{BadRequest, RetryInfo, WithErrorDetails};
+
+    #[test]
+    fn gen_status() {
+        let details = vec![
+            RetryInfo::with_retry_delay(Duration::from_secs(5)).into(),
+            BadRequest::with_violation("field", "description").into(),
+        ];
+
+        let fmt_details = format!("{:?}", details);
+
+        let status = match Status::with_error_details(
+            Code::InvalidArgument,
+            "error with bad request details",
+            details,
+        ) {
+            Ok(status) => status,
+            Err(err) => panic!("Error generating status: {:?}", err),
+        };
+
+        println!("{:?}", status);
+
+        let ext_details = match status.extract_error_details() {
+            Ok(ext_details) => ext_details,
+            Err(err) => panic!("Error extracting details from status: {:?}", err),
+        };
+
+        let ext_details = format!("{:?}", ext_details);
+
+        assert!(
+            fmt_details.eq(&ext_details),
+            "Extracted details differs from original details"
+        );
+    }
+}

@@ -1,17 +1,20 @@
+use std::time::Duration;
 use tonic::{Code, Status};
-use tonic_richer_error::{BadRequest, ErrorDetail, WithErrorDetails};
+use tonic_richer_error::{BadRequest, ErrorDetail, RetryInfo, WithErrorDetails};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let retry_info = RetryInfo::with_retry_delay(Duration::from_secs(5));
+
     let mut br_details = BadRequest::empty();
 
-    br_details
-        .add_violation("field_a", "description_a")
-        .add_violation("field_b", "description_b");
+    if true {
+        br_details.add_violation("field", "description of why value is invalid");
+    }
 
     let status = Status::with_error_details(
         Code::InvalidArgument,
         "error with bad request details",
-        vec![br_details],
+        vec![retry_info.into(), br_details.into()],
     )
     .unwrap();
 
@@ -22,6 +25,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for (i, err_detail) in err_details.iter().enumerate() {
         println!("err_detail[{i}]");
         match err_detail {
+            ErrorDetail::RetryInfo(retry_info) => {
+                println!(" {:?}", retry_info);
+                // deal with retry_info error details
+            }
             ErrorDetail::BadRequest(bad_req) => {
                 println!(" {:?}", bad_req);
                 // deal with bad_req error details
