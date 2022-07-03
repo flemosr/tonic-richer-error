@@ -1,4 +1,4 @@
-use prost::{DecodeError, Message};
+use prost::{DecodeError, EncodeError, Message};
 use prost_types::Any;
 
 use super::{pb, FromAny, ToAny};
@@ -34,7 +34,7 @@ impl BadRequest {
         self
     }
 
-    pub fn from_violation(field: impl Into<String>, violation: impl Into<String>) -> Self {
+    pub fn with_violation(field: impl Into<String>, violation: impl Into<String>) -> Self {
         BadRequest {
             field_violations: vec![FieldViolation {
                 field: field.into(),
@@ -49,7 +49,7 @@ impl BadRequest {
 }
 
 impl ToAny for BadRequest {
-    fn to_any(&self) -> Any {
+    fn to_any(&self) -> Result<Any, EncodeError> {
         let detail_data = pb::BadRequest {
             field_violations: self
                 .field_violations
@@ -61,14 +61,14 @@ impl ToAny for BadRequest {
                 .collect(),
         };
 
-        let mut bytes: Vec<u8> = Vec::new();
-        bytes.reserve(detail_data.encoded_len());
-        detail_data.encode(&mut bytes).unwrap();
+        let mut buf: Vec<u8> = Vec::new();
+        buf.reserve(detail_data.encoded_len());
+        detail_data.encode(&mut buf)?;
 
-        Any {
+        Ok(Any {
             type_url: BadRequest::TYPE_URL.to_string(),
-            value: bytes,
-        }
+            value: buf,
+        })
     }
 }
 
@@ -138,7 +138,10 @@ mod tests {
             "filled BadRequest returns 'false' from .has_violations()"
         );
 
-        let gen_any = br_details.to_any();
+        let gen_any = match br_details.to_any() {
+            Err(error) => panic!("Error generating Any from BadRequest: {:?}", error),
+            Ok(gen_any) => gen_any,
+        };
         let formatted = format!("{:?}", gen_any);
 
         println!("Any generated from BadRequest -> {formatted}");
@@ -151,7 +154,7 @@ mod tests {
         );
 
         let br_details = match BadRequest::from_any(&gen_any) {
-            Err(error) => panic!("Error generating Any from BadRequest: {:?}", error),
+            Err(error) => panic!("Error generating BadRequest from Any: {:?}", error),
             Ok(from_any) => from_any,
         };
 

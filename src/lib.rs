@@ -1,4 +1,4 @@
-use prost::{DecodeError, Message};
+use prost::{DecodeError, EncodeError, Message};
 use prost_types::Any;
 use tonic::{codegen::Bytes, Code, Status};
 
@@ -25,7 +25,7 @@ pub enum ErrorDetail {
 }
 
 pub trait ToAny {
-    fn to_any(&self) -> Any;
+    fn to_any(&self) -> Result<Any, EncodeError>;
 }
 
 trait FromAny {
@@ -39,7 +39,7 @@ pub trait WithErrorDetails {
         code: tonic::Code,
         message: impl Into<String>,
         details: Vec<impl ToAny>,
-    ) -> Status;
+    ) -> Result<Status, EncodeError>;
 
     fn extract_error_details(&self) -> Result<Vec<ErrorDetail>, DecodeError>;
 }
@@ -49,22 +49,25 @@ impl WithErrorDetails for Status {
         code: Code,
         message: impl Into<String>,
         details: Vec<impl ToAny>,
-    ) -> Self {
+    ) -> Result<Self, EncodeError> {
         let message: String = message.into();
+
+        let conv_details: Result<Vec<Any>, EncodeError> =
+            details.iter().map(|v| v.to_any()).collect();
+
+        let conv_details = conv_details?;
 
         let status = pb::Status {
             code: code as i32,
             message: message.clone(),
-            details: details.iter().map(|v| v.to_any()).collect(),
+            details: conv_details,
         };
 
-        let mut details_bytes: Vec<u8> = Vec::new();
-        details_bytes.reserve(status.encoded_len());
-        status.encode(&mut details_bytes).unwrap();
+        let mut buf: Vec<u8> = Vec::new();
+        buf.reserve(status.encoded_len());
+        status.encode(&mut buf)?;
 
-        let details_bytes = Bytes::from(details_bytes);
-
-        Status::with_details(code, message, details_bytes)
+        Ok(Status::with_details(code, message, Bytes::from(buf)))
     }
 
     fn extract_error_details(&self) -> Result<Vec<ErrorDetail>, DecodeError> {

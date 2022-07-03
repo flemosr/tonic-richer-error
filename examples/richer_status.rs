@@ -12,7 +12,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Code::InvalidArgument,
         "error with bad request details",
         vec![br_details],
-    );
+    )
+    .unwrap();
 
     println!("{:?}", status);
 
