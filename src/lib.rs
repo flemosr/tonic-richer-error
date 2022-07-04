@@ -18,6 +18,10 @@ mod quota_failure;
 
 pub use quota_failure::QuotaFailure;
 
+mod error_info;
+
+pub use error_info::ErrorInfo;
+
 mod bad_request;
 
 pub use bad_request::BadRequest;
@@ -27,7 +31,7 @@ pub enum ErrorDetail {
     RetryInfo(RetryInfo),
     DebugInfo(DebugInfo),
     QuotaFailure(QuotaFailure),
-    // ErrorInfo,
+    ErrorInfo(ErrorInfo),
     // PreconditionFailure,
     BadRequest(BadRequest),
     // RequestInfo,
@@ -51,6 +55,12 @@ impl From<DebugInfo> for ErrorDetail {
 impl From<QuotaFailure> for ErrorDetail {
     fn from(err_detail: QuotaFailure) -> Self {
         ErrorDetail::QuotaFailure(err_detail)
+    }
+}
+
+impl From<ErrorInfo> for ErrorDetail {
+    fn from(err_detail: ErrorInfo) -> Self {
+        ErrorDetail::ErrorInfo(err_detail)
     }
 }
 
@@ -104,6 +114,10 @@ impl WithErrorDetails for Status {
                     let any = quota_failure.into_any()?;
                     conv_details.push(any);
                 }
+                ErrorDetail::ErrorInfo(error_info) => {
+                    let any = error_info.into_any()?;
+                    conv_details.push(any);
+                }
                 ErrorDetail::BadRequest(bad_req) => {
                     let any = bad_req.into_any()?;
                     conv_details.push(any);
@@ -143,6 +157,10 @@ impl WithErrorDetails for Status {
                     let quota_failure = QuotaFailure::from_any(any)?;
                     details.push(ErrorDetail::QuotaFailure(quota_failure));
                 }
+                ErrorInfo::TYPE_URL => {
+                    let error_info = ErrorInfo::from_any(any)?;
+                    details.push(ErrorDetail::ErrorInfo(error_info));
+                }
                 BadRequest::TYPE_URL => {
                     let bad_req = BadRequest::from_any(any)?;
                     details.push(ErrorDetail::BadRequest(bad_req));
@@ -157,18 +175,22 @@ impl WithErrorDetails for Status {
 
 #[cfg(test)]
 mod tests {
-
+    use std::collections::HashMap;
     use std::time::Duration;
     use tonic::{Code, Status};
 
-    use super::{BadRequest, DebugInfo, QuotaFailure, RetryInfo, WithErrorDetails};
+    use super::{BadRequest, DebugInfo, ErrorInfo, QuotaFailure, RetryInfo, WithErrorDetails};
 
     #[test]
     fn gen_status() {
+        let mut metadata = HashMap::new();
+        metadata.insert("instanceLimitPerRequest", "100");
+
         let details = vec![
             RetryInfo::with_retry_delay(Duration::from_secs(5)).into(),
             DebugInfo::with_stack(vec!["trace3", "trace2", "trace1"], "details").into(),
             QuotaFailure::with_violation("clientip:<ip address>", "description").into(),
+            ErrorInfo::with_data("SOME_INFO", "mydomain.com", metadata).into(),
             BadRequest::with_violation("field", "description").into(),
         ];
 
