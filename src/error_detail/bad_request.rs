@@ -1,7 +1,8 @@
 use prost::{DecodeError, EncodeError, Message};
 use prost_types::Any;
 
-use super::{pb, FromAny, IntoAny};
+use super::super::pb;
+use super::super::{FromAny, IntoAny};
 
 #[derive(Clone, Debug)]
 pub struct FieldViolation {
@@ -95,8 +96,7 @@ impl FromAny for BadRequest {
 #[cfg(test)]
 mod tests {
 
-    use crate::{FromAny, IntoAny};
-
+    use super::super::super::{FromAny, IntoAny};
     use super::BadRequest;
 
     #[test]

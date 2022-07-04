@@ -3,7 +3,8 @@ use std::collections::HashMap;
 use prost::{DecodeError, EncodeError, Message};
 use prost_types::Any;
 
-use super::{pb, FromAny, IntoAny};
+use super::super::pb;
+use super::super::{FromAny, IntoAny};
 
 #[derive(Clone, Debug)]
 pub struct ErrorInfo {
@@ -84,8 +85,7 @@ mod tests {
 
     use std::collections::HashMap;
 
-    use crate::{FromAny, IntoAny};
-
+    use super::super::super::{FromAny, IntoAny};
     use super::ErrorInfo;
 
     #[test]
