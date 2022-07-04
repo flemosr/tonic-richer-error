@@ -35,6 +35,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!(" {:?}", debug_info);
                 // deal with debug_info error details
             }
+            ErrorDetail::QuotaFailure(quota_failure) => {
+                println!(" {:?}", quota_failure);
+                // deal with quota_failure error details
+            }
             ErrorDetail::BadRequest(bad_req) => {
                 println!(" {:?}", bad_req);
                 // deal with bad_req error details
