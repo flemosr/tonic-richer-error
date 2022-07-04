@@ -33,10 +33,10 @@ impl DebugInfo {
 }
 
 impl IntoAny for DebugInfo {
-    fn into_any(&self) -> Result<Any, EncodeError> {
+    fn into_any(self) -> Result<Any, EncodeError> {
         let detail_data = pb::DebugInfo {
-            stack_entries: self.stack_entries.clone(),
-            detail: self.detail.clone(),
+            stack_entries: self.stack_entries,
+            detail: self.detail,
         };
 
         let mut buf: Vec<u8> = Vec::new();
@@ -51,7 +51,7 @@ impl IntoAny for DebugInfo {
 }
 
 impl FromAny for DebugInfo {
-    fn from_any(any: &Any) -> Result<Self, DecodeError> {
+    fn from_any(any: Any) -> Result<Self, DecodeError> {
         let buf: &[u8] = &any.value;
         let debug_info = pb::DebugInfo::decode(buf)?;
 
@@ -117,7 +117,7 @@ mod tests {
             "Any from filled DebugInfo differs from expected result"
         );
 
-        let br_details = match DebugInfo::from_any(&gen_any) {
+        let br_details = match DebugInfo::from_any(gen_any) {
             Err(error) => panic!("Error generating DebugInfo from Any: {:?}", error),
             Ok(from_any) => from_any,
         };

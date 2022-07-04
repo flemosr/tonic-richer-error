@@ -46,11 +46,11 @@ impl ErrorInfo {
 }
 
 impl IntoAny for ErrorInfo {
-    fn into_any(&self) -> Result<Any, EncodeError> {
+    fn into_any(self) -> Result<Any, EncodeError> {
         let detail_data = pb::ErrorInfo {
-            reason: self.reason.clone(),
-            domain: self.domain.clone(),
-            metadata: self.metadata.clone(),
+            reason: self.reason,
+            domain: self.domain,
+            metadata: self.metadata,
         };
 
         let mut buf: Vec<u8> = Vec::new();
@@ -65,7 +65,7 @@ impl IntoAny for ErrorInfo {
 }
 
 impl FromAny for ErrorInfo {
-    fn from_any(any: &Any) -> Result<Self, DecodeError> {
+    fn from_any(any: Any) -> Result<Self, DecodeError> {
         let buf: &[u8] = &any.value;
         let debug_info = pb::ErrorInfo::decode(buf)?;
 
@@ -134,7 +134,7 @@ mod tests {
             "Any from filled ErrorInfo differs from expected result"
         );
 
-        let br_details = match ErrorInfo::from_any(&gen_any) {
+        let br_details = match ErrorInfo::from_any(gen_any) {
             Err(error) => panic!("Error generating ErrorInfo from Any: {:?}", error),
             Ok(from_any) => from_any,
         };

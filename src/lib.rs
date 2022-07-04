@@ -71,11 +71,11 @@ impl From<BadRequest> for ErrorDetail {
 }
 
 trait IntoAny {
-    fn into_any(&self) -> Result<Any, EncodeError>;
+    fn into_any(self) -> Result<Any, EncodeError>;
 }
 
 trait FromAny {
-    fn from_any(any: &Any) -> Result<Self, DecodeError>
+    fn from_any(any: Any) -> Result<Self, DecodeError>
     where
         Self: Sized;
 }
@@ -100,7 +100,7 @@ impl WithErrorDetails for Status {
 
         let mut conv_details: Vec<Any> = Vec::with_capacity(details.len());
 
-        for error_detail in details.iter() {
+        for error_detail in details.into_iter() {
             match error_detail {
                 ErrorDetail::RetryInfo(retry_info) => {
                     let any = retry_info.into_any()?;
@@ -143,7 +143,7 @@ impl WithErrorDetails for Status {
 
         let mut details: Vec<ErrorDetail> = Vec::with_capacity(status.details.len());
 
-        for any in status.details.iter() {
+        for any in status.details.into_iter() {
             match any.type_url.as_str() {
                 RetryInfo::TYPE_URL => {
                     let retry_info = RetryInfo::from_any(any)?;

@@ -49,14 +49,14 @@ impl BadRequest {
 }
 
 impl IntoAny for BadRequest {
-    fn into_any(&self) -> Result<Any, EncodeError> {
+    fn into_any(self) -> Result<Any, EncodeError> {
         let detail_data = pb::BadRequest {
             field_violations: self
                 .field_violations
-                .iter()
+                .into_iter()
                 .map(|v| pb::bad_request::FieldViolation {
-                    field: v.field.clone(),
-                    description: v.description.clone(),
+                    field: v.field,
+                    description: v.description,
                 })
                 .collect(),
         };
@@ -73,17 +73,17 @@ impl IntoAny for BadRequest {
 }
 
 impl FromAny for BadRequest {
-    fn from_any(any: &Any) -> Result<Self, DecodeError> {
+    fn from_any(any: Any) -> Result<Self, DecodeError> {
         let buf: &[u8] = &any.value;
         let bad_req = pb::BadRequest::decode(buf)?;
 
         let bad_req = BadRequest {
             field_violations: bad_req
                 .field_violations
-                .iter()
+                .into_iter()
                 .map(|v| FieldViolation {
-                    field: v.field.clone(),
-                    description: v.description.clone(),
+                    field: v.field,
+                    description: v.description,
                 })
                 .collect(),
         };
@@ -153,7 +153,7 @@ mod tests {
             "Any from filled BadRequest differs from expected result"
         );
 
-        let br_details = match BadRequest::from_any(&gen_any) {
+        let br_details = match BadRequest::from_any(gen_any) {
             Err(error) => panic!("Error generating BadRequest from Any: {:?}", error),
             Ok(from_any) => from_any,
         };

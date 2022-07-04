@@ -34,7 +34,7 @@ impl RetryInfo {
 }
 
 impl IntoAny for RetryInfo {
-    fn into_any(&self) -> Result<Any, EncodeError> {
+    fn into_any(self) -> Result<Any, EncodeError> {
         let retry_delay = match self.retry_delay {
             Some(duration) => Some(prost_types::Duration::from(duration)),
             None => None,
@@ -57,7 +57,7 @@ impl IntoAny for RetryInfo {
 
 impl FromAny for RetryInfo {
     // Negative retry_delays become 0
-    fn from_any(any: &Any) -> Result<Self, DecodeError> {
+    fn from_any(any: Any) -> Result<Self, DecodeError> {
         let buf: &[u8] = &any.value;
         let retry_info = pb::RetryInfo::decode(buf)?;
 
@@ -145,7 +145,7 @@ mod tests {
             "Any from filled RetryInfo differs from expected result"
         );
 
-        let br_details = match RetryInfo::from_any(&gen_any) {
+        let br_details = match RetryInfo::from_any(gen_any) {
             Err(error) => panic!("Error generating RetryInfo from Any: {:?}", error),
             Ok(from_any) => from_any,
         };

@@ -49,14 +49,14 @@ impl QuotaFailure {
 }
 
 impl IntoAny for QuotaFailure {
-    fn into_any(&self) -> Result<Any, EncodeError> {
+    fn into_any(self) -> Result<Any, EncodeError> {
         let detail_data = pb::QuotaFailure {
             violations: self
                 .violations
-                .iter()
+                .into_iter()
                 .map(|v| pb::quota_failure::Violation {
-                    subject: v.subject.clone(),
-                    description: v.description.clone(),
+                    subject: v.subject,
+                    description: v.description,
                 })
                 .collect(),
         };
@@ -73,17 +73,17 @@ impl IntoAny for QuotaFailure {
 }
 
 impl FromAny for QuotaFailure {
-    fn from_any(any: &Any) -> Result<Self, DecodeError> {
+    fn from_any(any: Any) -> Result<Self, DecodeError> {
         let buf: &[u8] = &any.value;
         let quota_failure = pb::QuotaFailure::decode(buf)?;
 
         let quota_failure = QuotaFailure {
             violations: quota_failure
                 .violations
-                .iter()
+                .into_iter()
                 .map(|v| Violation {
-                    subject: v.subject.clone(),
-                    description: v.description.clone(),
+                    subject: v.subject,
+                    description: v.description,
                 })
                 .collect(),
         };
@@ -153,7 +153,7 @@ mod tests {
             "Any from filled QuotaFailure differs from expected result"
         );
 
-        let br_details = match QuotaFailure::from_any(&gen_any) {
+        let br_details = match QuotaFailure::from_any(gen_any) {
             Err(error) => panic!("Error generating QuotaFailure from Any: {:?}", error),
             Ok(from_any) => from_any,
         };
