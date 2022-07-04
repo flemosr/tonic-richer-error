@@ -26,20 +26,20 @@ impl QuotaFailure {
     pub fn add_violation(
         &mut self,
         subject: impl Into<String>,
-        violation: impl Into<String>,
+        description: impl Into<String>,
     ) -> &mut Self {
         self.violations.append(&mut vec![Violation {
             subject: subject.into(),
-            description: violation.into(),
+            description: description.into(),
         }]);
         self
     }
 
-    pub fn with_violation(subject: impl Into<String>, violation: impl Into<String>) -> Self {
+    pub fn with_violation(subject: impl Into<String>, description: impl Into<String>) -> Self {
         QuotaFailure {
             violations: vec![Violation {
                 subject: subject.into(),
-                description: violation.into(),
+                description: description.into(),
             }],
         }
     }

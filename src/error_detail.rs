@@ -14,6 +14,10 @@ mod error_info;
 
 pub use error_info::ErrorInfo;
 
+mod prec_failure;
+
+pub use prec_failure::PreconditionFailure;
+
 mod bad_request;
 
 pub use bad_request::BadRequest;
@@ -24,7 +28,7 @@ pub enum ErrorDetail {
     DebugInfo(DebugInfo),
     QuotaFailure(QuotaFailure),
     ErrorInfo(ErrorInfo),
-    // PreconditionFailure,
+    PreconditionFailure(PreconditionFailure),
     BadRequest(BadRequest),
     // RequestInfo,
     // ResourceInfo,
@@ -53,6 +57,12 @@ impl From<QuotaFailure> for ErrorDetail {
 impl From<ErrorInfo> for ErrorDetail {
     fn from(err_detail: ErrorInfo) -> Self {
         ErrorDetail::ErrorInfo(err_detail)
+    }
+}
+
+impl From<PreconditionFailure> for ErrorDetail {
+    fn from(err_detail: PreconditionFailure) -> Self {
+        ErrorDetail::PreconditionFailure(err_detail)
     }
 }
 

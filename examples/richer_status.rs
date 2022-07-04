@@ -58,6 +58,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!(" {:?}", error_info);
                 // deal with error_info details
             }
+            ErrorDetail::PreconditionFailure(prec_failure) => {
+                println!(" {:?}", prec_failure);
+                // deal with prec_failure details
+            }
             ErrorDetail::BadRequest(bad_request) => {
                 println!(" {:?}", bad_request);
                 // deal with bad_request details

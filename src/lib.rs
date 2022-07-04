@@ -8,7 +8,9 @@ mod pb {
     include!("./pb/google.rpc.rs");
 }
 
-pub use error_detail::{BadRequest, DebugInfo, ErrorDetail, ErrorInfo, QuotaFailure, RetryInfo};
+pub use error_detail::{
+    BadRequest, DebugInfo, ErrorDetail, ErrorInfo, PreconditionFailure, QuotaFailure, RetryInfo,
+};
 
 trait IntoAny {
     fn into_any(self) -> Result<Any, EncodeError>;
@@ -58,6 +60,10 @@ impl WithErrorDetails for Status {
                     let any = error_info.into_any()?;
                     conv_details.push(any);
                 }
+                ErrorDetail::PreconditionFailure(prec_failure) => {
+                    let any = prec_failure.into_any()?;
+                    conv_details.push(any);
+                }
                 ErrorDetail::BadRequest(bad_req) => {
                     let any = bad_req.into_any()?;
                     conv_details.push(any);
@@ -87,23 +93,27 @@ impl WithErrorDetails for Status {
             match any.type_url.as_str() {
                 RetryInfo::TYPE_URL => {
                     let retry_info = RetryInfo::from_any(any)?;
-                    details.push(ErrorDetail::RetryInfo(retry_info));
+                    details.push(retry_info.into());
                 }
                 DebugInfo::TYPE_URL => {
                     let debug_info = DebugInfo::from_any(any)?;
-                    details.push(ErrorDetail::DebugInfo(debug_info));
+                    details.push(debug_info.into());
                 }
                 QuotaFailure::TYPE_URL => {
                     let quota_failure = QuotaFailure::from_any(any)?;
-                    details.push(ErrorDetail::QuotaFailure(quota_failure));
+                    details.push(quota_failure.into());
                 }
                 ErrorInfo::TYPE_URL => {
                     let error_info = ErrorInfo::from_any(any)?;
-                    details.push(ErrorDetail::ErrorInfo(error_info));
+                    details.push(error_info.into());
+                }
+                PreconditionFailure::TYPE_URL => {
+                    let prec_failure = PreconditionFailure::from_any(any)?;
+                    details.push(prec_failure.into());
                 }
                 BadRequest::TYPE_URL => {
                     let bad_req = BadRequest::from_any(any)?;
-                    details.push(ErrorDetail::BadRequest(bad_req));
+                    details.push(bad_req.into());
                 }
                 _ => {}
             }
@@ -119,7 +129,10 @@ mod tests {
     use std::time::Duration;
     use tonic::{Code, Status};
 
-    use super::{BadRequest, DebugInfo, ErrorInfo, QuotaFailure, RetryInfo, WithErrorDetails};
+    use super::{
+        BadRequest, DebugInfo, ErrorInfo, PreconditionFailure, QuotaFailure, RetryInfo,
+        WithErrorDetails,
+    };
 
     #[test]
     fn gen_status() {
@@ -130,6 +143,12 @@ mod tests {
             RetryInfo::with_retry_delay(Duration::from_secs(5)).into(),
             DebugInfo::with_stack(vec!["trace3", "trace2", "trace1"], "details").into(),
             QuotaFailure::with_violation("clientip:<ip address>", "description").into(),
+            PreconditionFailure::with_violation(
+                "TOS",
+                "example.local",
+                "Terms of service not accepted",
+            )
+            .into(),
             ErrorInfo::with_data("SOME_INFO", "mydomain.com", metadata).into(),
             BadRequest::with_violation("field", "description").into(),
         ];
