@@ -10,6 +10,10 @@ mod retry_info;
 
 pub use retry_info::RetryInfo;
 
+mod debug_info;
+
+pub use debug_info::DebugInfo;
+
 mod bad_request;
 
 pub use bad_request::BadRequest;
@@ -17,7 +21,7 @@ pub use bad_request::BadRequest;
 #[derive(Debug)]
 pub enum ErrorDetail {
     RetryInfo(RetryInfo),
-    // DebugInfo,
+    DebugInfo(DebugInfo),
     // QuotaFailure,
     // ErrorInfo,
     // PreconditionFailure,
@@ -31,6 +35,12 @@ pub enum ErrorDetail {
 impl From<RetryInfo> for ErrorDetail {
     fn from(err_detail: RetryInfo) -> Self {
         ErrorDetail::RetryInfo(err_detail)
+    }
+}
+
+impl From<DebugInfo> for ErrorDetail {
+    fn from(err_detail: DebugInfo) -> Self {
+        ErrorDetail::DebugInfo(err_detail)
     }
 }
 
@@ -76,6 +86,10 @@ impl WithErrorDetails for Status {
                     let any = retry_info.into_any()?;
                     conv_details.push(any);
                 }
+                ErrorDetail::DebugInfo(debug_info) => {
+                    let any = debug_info.into_any()?;
+                    conv_details.push(any);
+                }
                 ErrorDetail::BadRequest(bad_req) => {
                     let any = bad_req.into_any()?;
                     conv_details.push(any);
@@ -107,6 +121,10 @@ impl WithErrorDetails for Status {
                     let retry_info = RetryInfo::from_any(any)?;
                     details.push(ErrorDetail::RetryInfo(retry_info));
                 }
+                DebugInfo::TYPE_URL => {
+                    let debug_info = DebugInfo::from_any(any)?;
+                    details.push(ErrorDetail::DebugInfo(debug_info));
+                }
                 BadRequest::TYPE_URL => {
                     let bad_req = BadRequest::from_any(any)?;
                     details.push(ErrorDetail::BadRequest(bad_req));
@@ -125,16 +143,19 @@ mod tests {
     use std::time::Duration;
     use tonic::{Code, Status};
 
-    use super::{BadRequest, RetryInfo, WithErrorDetails};
+    use super::{BadRequest, DebugInfo, RetryInfo, WithErrorDetails};
 
     #[test]
     fn gen_status() {
         let details = vec![
             RetryInfo::with_retry_delay(Duration::from_secs(5)).into(),
+            DebugInfo::with_stack(vec!["trace3", "trace2", "trace1"], "details").into(),
             BadRequest::with_violation("field", "description").into(),
         ];
 
         let fmt_details = format!("{:?}", details);
+
+        println!("{fmt_details}\n");
 
         let status = match Status::with_error_details(
             Code::InvalidArgument,
@@ -145,7 +166,7 @@ mod tests {
             Err(err) => panic!("Error generating status: {:?}", err),
         };
 
-        println!("{:?}", status);
+        println!("{:?}\n", status);
 
         let ext_details = match status.extract_error_details() {
             Ok(ext_details) => ext_details,
@@ -153,6 +174,8 @@ mod tests {
         };
 
         let ext_details = format!("{:?}", ext_details);
+
+        println!("{ext_details}");
 
         assert!(
             fmt_details.eq(&ext_details),

@@ -5,7 +5,7 @@ use prost_types::Any;
 
 use super::{pb, FromAny, IntoAny};
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct RetryInfo {
     pub retry_delay: Option<time::Duration>,
 }
@@ -142,7 +142,7 @@ mod tests {
 
         assert!(
             formatted.eq(expected),
-            "Any from filled BadRequest differs from expected result"
+            "Any from filled RetryInfo differs from expected result"
         );
 
         let br_details = match RetryInfo::from_any(&gen_any) {

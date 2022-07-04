@@ -3,12 +3,12 @@ use prost_types::Any;
 
 use super::{pb, FromAny, IntoAny};
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct FieldViolation {
     pub field: String,
     pub description: String,
 }
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct BadRequest {
     pub field_violations: Vec<FieldViolation>,
 }
