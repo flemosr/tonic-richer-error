@@ -81,6 +81,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!(" {:?}", req_info);
                 // deal with req_info details
             }
+            ErrorDetail::ResourceInfo(res_info) => {
+                println!(" {:?}", res_info);
+                // deal with res_info details
+            }
         }
     }
 

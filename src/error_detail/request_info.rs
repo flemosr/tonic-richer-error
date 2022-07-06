@@ -7,7 +7,7 @@ use super::super::{FromAny, IntoAny};
 #[derive(Clone, Debug)]
 pub struct RequestInfo {
     pub request_id: String,
-    pub servind_data: String,
+    pub serving_data: String,
 }
 
 impl RequestInfo {
@@ -16,19 +16,19 @@ impl RequestInfo {
     pub fn empty() -> Self {
         RequestInfo {
             request_id: String::from(""),
-            servind_data: String::from(""),
+            serving_data: String::from(""),
         }
     }
 
     pub fn with_data(request_id: impl Into<String>, serving_data: impl Into<String>) -> Self {
         RequestInfo {
             request_id: request_id.into(),
-            servind_data: serving_data.into(),
+            serving_data: serving_data.into(),
         }
     }
 
     pub fn is_empty(&self) -> bool {
-        self.request_id.is_empty() && self.servind_data.is_empty()
+        self.request_id.is_empty() && self.serving_data.is_empty()
     }
 }
 
@@ -36,7 +36,7 @@ impl IntoAny for RequestInfo {
     fn into_any(self) -> Result<Any, EncodeError> {
         let detail_data = pb::RequestInfo {
             request_id: self.request_id,
-            serving_data: self.servind_data,
+            serving_data: self.serving_data,
         };
 
         let mut buf: Vec<u8> = Vec::new();
@@ -57,7 +57,7 @@ impl FromAny for RequestInfo {
 
         let debug_info = RequestInfo {
             request_id: req_info.request_id,
-            servind_data: req_info.serving_data,
+            serving_data: req_info.serving_data,
         };
 
         Ok(debug_info)
@@ -77,7 +77,7 @@ mod tests {
 
         println!("empty RequestInfo -> {formatted}");
 
-        let expected = "RequestInfo { request_id: \"\", servind_data: \"\" }";
+        let expected = "RequestInfo { request_id: \"\", serving_data: \"\" }";
 
         assert!(
             formatted.eq(expected),
@@ -91,7 +91,7 @@ mod tests {
         println!("filled RequestInfo -> {formatted}");
 
         let expected_filled =
-            "RequestInfo { request_id: \"some-id\", servind_data: \"some-data\" }";
+            "RequestInfo { request_id: \"some-id\", serving_data: \"some-data\" }";
 
         assert!(
             formatted.eq(expected_filled),

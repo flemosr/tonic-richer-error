@@ -10,7 +10,7 @@ mod pb {
 
 pub use error_detail::{
     BadRequest, DebugInfo, ErrorDetail, ErrorInfo, PreconditionFailure, QuotaFailure, RequestInfo,
-    RetryInfo,
+    ResourceInfo, RetryInfo,
 };
 
 trait IntoAny {
@@ -73,6 +73,10 @@ impl WithErrorDetails for Status {
                     let any = req_info.into_any()?;
                     conv_details.push(any);
                 }
+                ErrorDetail::ResourceInfo(res_info) => {
+                    let any = res_info.into_any()?;
+                    conv_details.push(any);
+                }
             }
         }
 
@@ -124,6 +128,10 @@ impl WithErrorDetails for Status {
                     let error_info = RequestInfo::from_any(any)?;
                     details.push(error_info.into());
                 }
+                ResourceInfo::TYPE_URL => {
+                    let error_info = ResourceInfo::from_any(any)?;
+                    details.push(error_info.into());
+                }
                 _ => {}
             }
         }
@@ -140,7 +148,7 @@ mod tests {
 
     use super::{
         BadRequest, DebugInfo, ErrorInfo, PreconditionFailure, QuotaFailure, RequestInfo,
-        RetryInfo, WithErrorDetails,
+        ResourceInfo, RetryInfo, WithErrorDetails,
     };
 
     #[test]
@@ -161,6 +169,8 @@ mod tests {
             ErrorInfo::with_data("SOME_INFO", "mydomain.com", metadata).into(),
             BadRequest::with_violation("field", "description").into(),
             RequestInfo::with_data("request-id", "some-request-data").into(),
+            ResourceInfo::with_data("resource-type", "resource-name", "owner", "description")
+                .into(),
         ];
 
         let fmt_details = format!("{:?}", details);
