@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use std::time::Duration;
 use tonic::{Code, Status};
 use tonic_richer_error::{
-    BadRequest, DebugInfo, ErrorDetail, ErrorInfo, QuotaFailure, RetryInfo, WithErrorDetails,
+    BadRequest, DebugInfo, ErrorDetail, ErrorInfo, QuotaFailure, RequestInfo, RetryInfo,
+    WithErrorDetails,
 };
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -16,21 +17,31 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     metadata.insert("instanceLimitPerRequest", "100");
 
     let error_info = ErrorInfo::with_data("SOME_INFO", "mydomain.com", metadata);
+
     let mut br_details = BadRequest::empty();
 
     if true {
-        br_details.add_violation("field", "description of why value is invalid");
+        br_details
+            .add_violation("field_1", "description of why value is invalid")
+            .add_violation("field_2", "description of why value is invalid")
+            .add_violation("field", "description of why value is invalid")
+            .add_violation("field", "description of why value is invalid")
+            .add_violation("field", "description of why value is invalid");
     }
+
+    let req_info = RequestInfo::with_data("request-id", "some-req-data");
+    // let st = Status::internal("acont4cirf bshrf bwhbr");
 
     let status = Status::with_error_details(
         Code::InvalidArgument,
-        "error with bad request details",
+        "BAD_REQUEST",
         vec![
             retry_info.into(),
             debug_info.into(),
             quota_failure.into(),
             error_info.into(),
             br_details.into(),
+            req_info.into(),
         ],
     )
     .unwrap();
@@ -65,6 +76,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ErrorDetail::BadRequest(bad_request) => {
                 println!(" {:?}", bad_request);
                 // deal with bad_request details
+            }
+            ErrorDetail::RequestInfo(req_info) => {
+                println!(" {:?}", req_info);
+                // deal with req_info details
             }
         }
     }

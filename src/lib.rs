@@ -9,7 +9,8 @@ mod pb {
 }
 
 pub use error_detail::{
-    BadRequest, DebugInfo, ErrorDetail, ErrorInfo, PreconditionFailure, QuotaFailure, RetryInfo,
+    BadRequest, DebugInfo, ErrorDetail, ErrorInfo, PreconditionFailure, QuotaFailure, RequestInfo,
+    RetryInfo,
 };
 
 trait IntoAny {
@@ -68,6 +69,10 @@ impl WithErrorDetails for Status {
                     let any = bad_req.into_any()?;
                     conv_details.push(any);
                 }
+                ErrorDetail::RequestInfo(req_info) => {
+                    let any = req_info.into_any()?;
+                    conv_details.push(any);
+                }
             }
         }
 
@@ -115,6 +120,10 @@ impl WithErrorDetails for Status {
                     let bad_req = BadRequest::from_any(any)?;
                     details.push(bad_req.into());
                 }
+                RequestInfo::TYPE_URL => {
+                    let error_info = RequestInfo::from_any(any)?;
+                    details.push(error_info.into());
+                }
                 _ => {}
             }
         }
@@ -130,8 +139,8 @@ mod tests {
     use tonic::{Code, Status};
 
     use super::{
-        BadRequest, DebugInfo, ErrorInfo, PreconditionFailure, QuotaFailure, RetryInfo,
-        WithErrorDetails,
+        BadRequest, DebugInfo, ErrorInfo, PreconditionFailure, QuotaFailure, RequestInfo,
+        RetryInfo, WithErrorDetails,
     };
 
     #[test]
@@ -151,6 +160,7 @@ mod tests {
             .into(),
             ErrorInfo::with_data("SOME_INFO", "mydomain.com", metadata).into(),
             BadRequest::with_violation("field", "description").into(),
+            RequestInfo::with_data("request-id", "some-request-data").into(),
         ];
 
         let fmt_details = format!("{:?}", details);
