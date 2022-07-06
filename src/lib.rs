@@ -9,8 +9,8 @@ mod pb {
 }
 
 pub use error_detail::{
-    BadRequest, DebugInfo, ErrorDetail, ErrorInfo, Help, PreconditionFailure, QuotaFailure,
-    RequestInfo, ResourceInfo, RetryInfo,
+    BadRequest, DebugInfo, ErrorDetail, ErrorInfo, Help, LocalizedMessage, PreconditionFailure,
+    QuotaFailure, RequestInfo, ResourceInfo, RetryInfo,
 };
 
 trait IntoAny {
@@ -81,6 +81,10 @@ impl WithErrorDetails for Status {
                     let any = help.into_any()?;
                     conv_details.push(any);
                 }
+                ErrorDetail::LocalizedMessage(loc_message) => {
+                    let any = loc_message.into_any()?;
+                    conv_details.push(any);
+                }
             }
         }
 
@@ -140,6 +144,10 @@ impl WithErrorDetails for Status {
                     let help = Help::from_any(any)?;
                     details.push(help.into());
                 }
+                LocalizedMessage::TYPE_URL => {
+                    let help = LocalizedMessage::from_any(any)?;
+                    details.push(help.into());
+                }
                 _ => {}
             }
         }
@@ -155,8 +163,8 @@ mod tests {
     use tonic::{Code, Status};
 
     use super::{
-        BadRequest, DebugInfo, ErrorInfo, Help, PreconditionFailure, QuotaFailure, RequestInfo,
-        ResourceInfo, RetryInfo, WithErrorDetails,
+        BadRequest, DebugInfo, ErrorInfo, Help, LocalizedMessage, PreconditionFailure,
+        QuotaFailure, RequestInfo, ResourceInfo, RetryInfo, WithErrorDetails,
     };
 
     #[test]
@@ -180,6 +188,7 @@ mod tests {
             ResourceInfo::with_data("resource-type", "resource-name", "owner", "description")
                 .into(),
             Help::with_link("link to resoure a", "resource-a.example.local").into(),
+            LocalizedMessage::with_data("en-US", "message to the user").into(),
         ];
 
         let fmt_details = format!("{:?}", details);

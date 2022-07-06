@@ -34,6 +34,10 @@ mod help;
 
 pub use help::Help;
 
+mod loc_message;
+
+pub use loc_message::LocalizedMessage;
+
 #[derive(Debug)]
 pub enum ErrorDetail {
     RetryInfo(RetryInfo),
@@ -45,7 +49,7 @@ pub enum ErrorDetail {
     RequestInfo(RequestInfo),
     ResourceInfo(ResourceInfo),
     Help(Help),
-    // LocalizedMessage,
+    LocalizedMessage(LocalizedMessage),
 }
 
 impl From<RetryInfo> for ErrorDetail {
@@ -99,5 +103,11 @@ impl From<ResourceInfo> for ErrorDetail {
 impl From<Help> for ErrorDetail {
     fn from(err_detail: Help) -> Self {
         ErrorDetail::Help(err_detail)
+    }
+}
+
+impl From<LocalizedMessage> for ErrorDetail {
+    fn from(err_detail: LocalizedMessage) -> Self {
+        ErrorDetail::LocalizedMessage(err_detail)
     }
 }

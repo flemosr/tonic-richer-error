@@ -89,6 +89,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!(" {:?}", help);
                 // deal with help details
             }
+            ErrorDetail::LocalizedMessage(loc_message) => {
+                println!(" {:?}", loc_message);
+                // deal with loc_message details
+            }
         }
     }
 
