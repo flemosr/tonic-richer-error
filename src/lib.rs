@@ -9,8 +9,8 @@ mod pb {
 }
 
 pub use error_detail::{
-    BadRequest, DebugInfo, ErrorDetail, ErrorInfo, PreconditionFailure, QuotaFailure, RequestInfo,
-    ResourceInfo, RetryInfo,
+    BadRequest, DebugInfo, ErrorDetail, ErrorInfo, Help, PreconditionFailure, QuotaFailure,
+    RequestInfo, ResourceInfo, RetryInfo,
 };
 
 trait IntoAny {
@@ -77,6 +77,10 @@ impl WithErrorDetails for Status {
                     let any = res_info.into_any()?;
                     conv_details.push(any);
                 }
+                ErrorDetail::Help(help) => {
+                    let any = help.into_any()?;
+                    conv_details.push(any);
+                }
             }
         }
 
@@ -132,6 +136,10 @@ impl WithErrorDetails for Status {
                     let error_info = ResourceInfo::from_any(any)?;
                     details.push(error_info.into());
                 }
+                Help::TYPE_URL => {
+                    let help = Help::from_any(any)?;
+                    details.push(help.into());
+                }
                 _ => {}
             }
         }
@@ -147,7 +155,7 @@ mod tests {
     use tonic::{Code, Status};
 
     use super::{
-        BadRequest, DebugInfo, ErrorInfo, PreconditionFailure, QuotaFailure, RequestInfo,
+        BadRequest, DebugInfo, ErrorInfo, Help, PreconditionFailure, QuotaFailure, RequestInfo,
         ResourceInfo, RetryInfo, WithErrorDetails,
     };
 
@@ -171,6 +179,7 @@ mod tests {
             RequestInfo::with_data("request-id", "some-request-data").into(),
             ResourceInfo::with_data("resource-type", "resource-name", "owner", "description")
                 .into(),
+            Help::with_link("link to resoure a", "resource-a.example.local").into(),
         ];
 
         let fmt_details = format!("{:?}", details);

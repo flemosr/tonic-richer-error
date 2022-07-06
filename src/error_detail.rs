@@ -30,6 +30,10 @@ mod resource_info;
 
 pub use resource_info::ResourceInfo;
 
+mod help;
+
+pub use help::Help;
+
 #[derive(Debug)]
 pub enum ErrorDetail {
     RetryInfo(RetryInfo),
@@ -40,7 +44,7 @@ pub enum ErrorDetail {
     BadRequest(BadRequest),
     RequestInfo(RequestInfo),
     ResourceInfo(ResourceInfo),
-    // Help,
+    Help(Help),
     // LocalizedMessage,
 }
 
@@ -89,5 +93,11 @@ impl From<RequestInfo> for ErrorDetail {
 impl From<ResourceInfo> for ErrorDetail {
     fn from(err_detail: ResourceInfo) -> Self {
         ErrorDetail::ResourceInfo(err_detail)
+    }
+}
+
+impl From<Help> for ErrorDetail {
+    fn from(err_detail: Help) -> Self {
+        ErrorDetail::Help(err_detail)
     }
 }

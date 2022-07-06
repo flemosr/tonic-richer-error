@@ -85,6 +85,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!(" {:?}", res_info);
                 // deal with res_info details
             }
+            ErrorDetail::Help(help) => {
+                println!(" {:?}", help);
+                // deal with help details
+            }
         }
     }
 
