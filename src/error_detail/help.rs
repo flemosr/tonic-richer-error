@@ -17,10 +17,21 @@ pub struct Help {
 impl Help {
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.Help";
 
-    pub fn empty() -> Self {
-        Help { links: Vec::new() }
+    pub fn new(links: Vec<Link>) -> Self {
+        Help { links }
     }
 
+    pub fn with_link(description: impl Into<String>, url: impl Into<String>) -> Self {
+        Help {
+            links: vec![Link {
+                description: description.into(),
+                url: url.into(),
+            }],
+        }
+    }
+}
+
+impl Help {
     pub fn add_link(
         &mut self,
         description: impl Into<String>,
@@ -33,17 +44,8 @@ impl Help {
         self
     }
 
-    pub fn with_link(description: impl Into<String>, url: impl Into<String>) -> Self {
-        Help {
-            links: vec![Link {
-                description: description.into(),
-                url: url.into(),
-            }],
-        }
-    }
-
-    pub fn has_links(&self) -> bool {
-        self.links.is_empty() == false
+    pub fn is_empty(&self) -> bool {
+        self.links.is_empty()
     }
 }
 
@@ -99,7 +101,7 @@ mod tests {
 
     #[test]
     fn gen_quota_failure() {
-        let mut help = Help::empty();
+        let mut help = Help::new(Vec::new());
         let formatted = format!("{:?}", help);
 
         println!("empty Help -> {formatted}");
@@ -112,8 +114,8 @@ mod tests {
         );
 
         assert!(
-            help.has_links() == false,
-            "empty Help returns 'true' from .has_violations()"
+            help.is_empty(),
+            "empty Help returns 'false' from .is_empty()"
         );
 
         help.add_link("link to resource a", "resource-a.example.local")
@@ -131,8 +133,8 @@ mod tests {
         );
 
         assert!(
-            help.has_links() == true,
-            "filled Help returns 'false' from .has_violations()"
+            help.is_empty() == false,
+            "filled Help returns 'true' from .is_empty()"
         );
 
         let gen_any = match help.into_any() {

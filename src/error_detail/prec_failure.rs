@@ -18,24 +18,10 @@ pub struct PreconditionFailure {
 impl PreconditionFailure {
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.PreconditionFailure";
 
-    pub fn empty() -> Self {
+    pub fn new(violations: Vec<Violation>) -> Self {
         PreconditionFailure {
-            violations: Vec::new(),
+            violations: violations,
         }
-    }
-
-    pub fn add_violation(
-        &mut self,
-        r#type: impl Into<String>,
-        subject: impl Into<String>,
-        description: impl Into<String>,
-    ) -> &mut Self {
-        self.violations.append(&mut vec![Violation {
-            r#type: r#type.into(),
-            subject: subject.into(),
-            description: description.into(),
-        }]);
-        self
     }
 
     pub fn with_violation(
@@ -51,9 +37,25 @@ impl PreconditionFailure {
             }],
         }
     }
+}
 
-    pub fn has_violations(&self) -> bool {
-        self.violations.is_empty() == false
+impl PreconditionFailure {
+    pub fn add_violation(
+        &mut self,
+        r#type: impl Into<String>,
+        subject: impl Into<String>,
+        description: impl Into<String>,
+    ) -> &mut Self {
+        self.violations.append(&mut vec![Violation {
+            r#type: r#type.into(),
+            subject: subject.into(),
+            description: description.into(),
+        }]);
+        self
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.violations.is_empty()
     }
 }
 
@@ -111,7 +113,7 @@ mod tests {
 
     #[test]
     fn gen_prec_failure() {
-        let mut prec_failure = PreconditionFailure::empty();
+        let mut prec_failure = PreconditionFailure::new(Vec::new());
         let formatted = format!("{:?}", prec_failure);
 
         println!("empty PreconditionFailure -> {formatted}");
@@ -124,8 +126,8 @@ mod tests {
         );
 
         assert!(
-            prec_failure.has_violations() == false,
-            "empty PreconditionFailure returns 'true' from .has_violations()"
+            prec_failure.is_empty(),
+            "empty PreconditionFailure returns 'false' from .is_empty()"
         );
 
         prec_failure
@@ -144,8 +146,8 @@ mod tests {
         );
 
         assert!(
-            prec_failure.has_violations() == true,
-            "filled PreconditionFailure returns 'false' from .has_violations()"
+            prec_failure.is_empty() == false,
+            "filled PreconditionFailure returns 'true' from .is_empty()"
         );
 
         let gen_any = match prec_failure.into_any() {

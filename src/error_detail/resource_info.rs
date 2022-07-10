@@ -15,16 +15,7 @@ pub struct ResourceInfo {
 impl ResourceInfo {
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.ResourceInfo";
 
-    pub fn empty() -> Self {
-        ResourceInfo {
-            resource_type: String::from(""),
-            resource_name: String::from(""),
-            owner: String::from(""),
-            description: String::from(""),
-        }
-    }
-
-    pub fn with_data(
+    pub fn new(
         resource_type: impl Into<String>,
         resource_name: impl Into<String>,
         owner: impl Into<String>,
@@ -37,7 +28,9 @@ impl ResourceInfo {
             description: description.into(),
         }
     }
+}
 
+impl ResourceInfo {
     pub fn is_empty(&self) -> bool {
         self.resource_type.is_empty()
             && self.resource_name.is_empty()
@@ -90,20 +83,8 @@ mod tests {
 
     #[test]
     fn gen_error_info() {
-        let error_info = ResourceInfo::empty();
-        let formatted = format!("{:?}", error_info);
-
-        println!("empty ResourceInfo -> {formatted}");
-
-        let expected = "ResourceInfo { resource_type: \"\", resource_name: \"\", owner: \"\", description: \"\" }";
-
-        assert!(
-            formatted.eq(expected),
-            "empty ResourceInfo differs from expected result"
-        );
-
         let error_info =
-            ResourceInfo::with_data("resource-type", "resource-name", "owner", "description");
+            ResourceInfo::new("resource-type", "resource-name", "owner", "description");
 
         let formatted = format!("{:?}", error_info);
 

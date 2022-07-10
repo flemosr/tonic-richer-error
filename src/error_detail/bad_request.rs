@@ -9,6 +9,7 @@ pub struct FieldViolation {
     pub field: String,
     pub description: String,
 }
+
 #[derive(Clone, Debug)]
 pub struct BadRequest {
     pub field_violations: Vec<FieldViolation>,
@@ -17,35 +18,35 @@ pub struct BadRequest {
 impl BadRequest {
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.BadRequest";
 
-    pub fn empty() -> Self {
-        BadRequest {
-            field_violations: Vec::new(),
-        }
+    pub fn new(field_violations: Vec<FieldViolation>) -> Self {
+        BadRequest { field_violations }
     }
 
+    pub fn with_violation(field: impl Into<String>, description: impl Into<String>) -> Self {
+        BadRequest {
+            field_violations: vec![FieldViolation {
+                field: field.into(),
+                description: description.into(),
+            }],
+        }
+    }
+}
+
+impl BadRequest {
     pub fn add_violation(
         &mut self,
         field: impl Into<String>,
-        violation: impl Into<String>,
+        description: impl Into<String>,
     ) -> &mut Self {
         self.field_violations.append(&mut vec![FieldViolation {
             field: field.into(),
-            description: violation.into(),
+            description: description.into(),
         }]);
         self
     }
 
-    pub fn with_violation(field: impl Into<String>, violation: impl Into<String>) -> Self {
-        BadRequest {
-            field_violations: vec![FieldViolation {
-                field: field.into(),
-                description: violation.into(),
-            }],
-        }
-    }
-
-    pub fn has_violations(&self) -> bool {
-        self.field_violations.is_empty() == false
+    pub fn is_empty(&self) -> bool {
+        self.field_violations.is_empty()
     }
 }
 
@@ -101,7 +102,7 @@ mod tests {
 
     #[test]
     fn gen_bad_request() {
-        let mut br_details = BadRequest::empty();
+        let mut br_details = BadRequest::new(Vec::new());
         let formatted = format!("{:?}", br_details);
 
         println!("empty BadRequest -> {formatted}");
@@ -114,8 +115,8 @@ mod tests {
         );
 
         assert!(
-            br_details.has_violations() == false,
-            "empty BadRequest returns 'true' from .has_violations()"
+            br_details.is_empty(),
+            "empty BadRequest returns 'false' from .is_empty()"
         );
 
         br_details
@@ -134,8 +135,8 @@ mod tests {
         );
 
         assert!(
-            br_details.has_violations() == true,
-            "filled BadRequest returns 'false' from .has_violations()"
+            br_details.is_empty() == false,
+            "filled BadRequest returns 'true' from .is_empty()"
         );
 
         let gen_any = match br_details.into_any() {

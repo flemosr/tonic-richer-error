@@ -13,20 +13,15 @@ pub struct RequestInfo {
 impl RequestInfo {
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.RequestInfo";
 
-    pub fn empty() -> Self {
-        RequestInfo {
-            request_id: String::from(""),
-            serving_data: String::from(""),
-        }
-    }
-
-    pub fn with_data(request_id: impl Into<String>, serving_data: impl Into<String>) -> Self {
+    pub fn new(request_id: impl Into<String>, serving_data: impl Into<String>) -> Self {
         RequestInfo {
             request_id: request_id.into(),
             serving_data: serving_data.into(),
         }
     }
+}
 
+impl RequestInfo {
     pub fn is_empty(&self) -> bool {
         self.request_id.is_empty() && self.serving_data.is_empty()
     }
@@ -72,19 +67,7 @@ mod tests {
 
     #[test]
     fn gen_error_info() {
-        let error_info = RequestInfo::empty();
-        let formatted = format!("{:?}", error_info);
-
-        println!("empty RequestInfo -> {formatted}");
-
-        let expected = "RequestInfo { request_id: \"\", serving_data: \"\" }";
-
-        assert!(
-            formatted.eq(expected),
-            "empty RequestInfo differs from expected result"
-        );
-
-        let error_info = RequestInfo::with_data("some-id", "some-data");
+        let error_info = RequestInfo::new("some-id", "some-data");
 
         let formatted = format!("{:?}", error_info);
 

@@ -13,23 +13,17 @@ pub struct DebugInfo {
 impl DebugInfo {
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.DebugInfo";
 
-    pub fn empty() -> Self {
-        DebugInfo {
-            stack_entries: Vec::new(),
-            detail: String::from(""),
-        }
-    }
-
-    pub fn with_stack(stack_entries: Vec<impl Into<String>>, detail: impl Into<String>) -> Self {
-        let stack_entries = stack_entries
-            .into_iter()
-            .map(|e| Into::<String>::into(e))
-            .collect();
-
+    pub fn new(stack_entries: Vec<String>, detail: impl Into<String>) -> Self {
         DebugInfo {
             stack_entries: stack_entries,
             detail: detail.into(),
         }
+    }
+}
+
+impl DebugInfo {
+    pub fn is_empty(&self) -> bool {
+        self.stack_entries.is_empty() && self.detail.is_empty()
     }
 }
 
@@ -73,20 +67,12 @@ mod tests {
 
     #[test]
     fn gen_debug_info() {
-        let debug_info = DebugInfo::empty();
-        let formatted = format!("{:?}", debug_info);
-
-        println!("empty DebugInfo -> {formatted}");
-
-        let expected = "DebugInfo { stack_entries: [], detail: \"\" }";
-
-        assert!(
-            formatted.eq(expected),
-            "empty DebugInfo differs from expected result"
-        );
-
-        let debug_info = DebugInfo::with_stack(
-            vec!["trace 3", "trace 2", "trace 1"],
+        let debug_info = DebugInfo::new(
+            vec![
+                "trace 3".to_string(),
+                "trace 2".to_string(),
+                "trace 1".to_string(),
+            ],
             "details about the error",
         );
 

@@ -14,23 +14,16 @@ pub struct RetryInfo {
 impl RetryInfo {
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.RetryInfo";
 
-    pub fn empty() -> Self {
-        RetryInfo { retry_delay: None }
-    }
-
-    pub fn set_retry_delay(&mut self, retry_delay: time::Duration) -> &mut Self {
-        self.retry_delay = Some(retry_delay);
-        self
-    }
-
-    pub fn with_retry_delay(retry_delay: time::Duration) -> Self {
+    pub fn new(retry_delay: Option<time::Duration>) -> Self {
         RetryInfo {
-            retry_delay: Some(retry_delay),
+            retry_delay: retry_delay,
         }
     }
+}
 
-    pub fn has_retry_delay(&self) -> bool {
-        self.retry_delay.is_none() == false
+impl RetryInfo {
+    pub fn is_empty(&self) -> bool {
+        self.retry_delay.is_none()
     }
 }
 
@@ -95,24 +88,7 @@ mod tests {
 
     #[test]
     fn gen_retry_info() {
-        let mut ri_details = RetryInfo::empty();
-        let formatted = format!("{:?}", ri_details);
-
-        println!("empty RetryInfo -> {formatted}");
-
-        let expected = "RetryInfo { retry_delay: None }";
-
-        assert!(
-            formatted.eq(expected),
-            "empty RetryInfo differs from expected result"
-        );
-
-        assert!(
-            ri_details.has_retry_delay() == false,
-            "empty RetryInfo returns 'true' from .has_delay()"
-        );
-
-        ri_details.set_retry_delay(Duration::from_secs(5));
+        let ri_details = RetryInfo::new(Some(Duration::from_secs(5)));
 
         let formatted = format!("{:?}", ri_details);
 
@@ -126,7 +102,7 @@ mod tests {
         );
 
         assert!(
-            ri_details.has_retry_delay() == true,
+            ri_details.is_empty() == false,
             "filled RetryInfo returns 'false' from .has_retry_delay()"
         );
 

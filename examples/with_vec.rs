@@ -7,32 +7,35 @@ use tonic_richer_error::{
 };
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let retry_info = RetryInfo::with_retry_delay(Duration::from_secs(5));
+    let retry_info = RetryInfo::new(Some(Duration::from_secs(5)));
 
-    let debug_info = DebugInfo::with_stack(vec!["trace3", "trace2", "trace1"], "details");
+    let debug_info = DebugInfo::new(
+        vec![
+            "trace3".to_string(),
+            "trace2".to_string(),
+            "trace1".to_string(),
+        ],
+        "details",
+    );
 
     let quota_failure = QuotaFailure::with_violation("clientip:<ip address>", "description");
 
-    let mut metadata = HashMap::new();
-    metadata.insert("instanceLimitPerRequest", "100");
+    let mut metadata: HashMap<String, String> = HashMap::new();
+    metadata.insert("instanceLimitPerRequest".into(), "100".into());
 
-    let error_info = ErrorInfo::with_data("SOME_INFO", "mydomain.com", metadata);
+    let error_info = ErrorInfo::new("SOME_INFO", "mydomain.com", metadata);
 
-    let mut br_details = BadRequest::empty();
+    let mut br_details = BadRequest::new(Vec::new());
 
     if true {
         br_details
             .add_violation("field_1", "description of why value is invalid")
-            .add_violation("field_2", "description of why value is invalid")
-            .add_violation("field", "description of why value is invalid")
-            .add_violation("field", "description of why value is invalid")
-            .add_violation("field", "description of why value is invalid");
+            .add_violation("field_2", "description of why value is invalid");
     }
 
-    let req_info = RequestInfo::with_data("request-id", "some-req-data");
-    // let st = Status::internal("acont4cirf bshrf bwhbr");
+    let req_info = RequestInfo::new("request-id", "some-req-data");
 
-    let status = Status::with_error_details(
+    let status = Status::with_error_details_vec(
         Code::InvalidArgument,
         "BAD_REQUEST",
         vec![
@@ -48,7 +51,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("{:?}", status);
 
-    let err_details = status.extract_error_details().unwrap_or(vec![]);
+    let err_details = status.get_error_details_vec().unwrap_or(vec![]);
 
     for (i, err_detail) in err_details.iter().enumerate() {
         println!("err_detail[{i}]");

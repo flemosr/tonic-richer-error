@@ -13,20 +13,15 @@ pub struct LocalizedMessage {
 impl LocalizedMessage {
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.LocalizedMessage";
 
-    pub fn empty() -> Self {
-        LocalizedMessage {
-            locale: String::from(""),
-            message: String::from(""),
-        }
-    }
-
-    pub fn with_data(locale: impl Into<String>, message: impl Into<String>) -> Self {
+    pub fn new(locale: impl Into<String>, message: impl Into<String>) -> Self {
         LocalizedMessage {
             locale: locale.into(),
             message: message.into(),
         }
     }
+}
 
+impl LocalizedMessage {
     pub fn is_empty(&self) -> bool {
         self.locale.is_empty() && self.message.is_empty()
     }
@@ -72,19 +67,7 @@ mod tests {
 
     #[test]
     fn gen_error_info() {
-        let error_info = LocalizedMessage::empty();
-        let formatted = format!("{:?}", error_info);
-
-        println!("empty LocalizedMessage -> {formatted}");
-
-        let expected = "LocalizedMessage { locale: \"\", message: \"\" }";
-
-        assert!(
-            formatted.eq(expected),
-            "empty LocalizedMessage differs from expected result"
-        );
-
-        let error_info = LocalizedMessage::with_data("en-US", "message for the user");
+        let error_info = LocalizedMessage::new("en-US", "message for the user");
 
         let formatted = format!("{:?}", error_info);
 

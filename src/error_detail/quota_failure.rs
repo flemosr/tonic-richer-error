@@ -17,12 +17,23 @@ pub struct QuotaFailure {
 impl QuotaFailure {
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.QuotaFailure";
 
-    pub fn empty() -> Self {
+    pub fn new(violations: Vec<Violation>) -> Self {
         QuotaFailure {
-            violations: Vec::new(),
+            violations: violations,
         }
     }
 
+    pub fn with_violation(subject: impl Into<String>, description: impl Into<String>) -> Self {
+        QuotaFailure {
+            violations: vec![Violation {
+                subject: subject.into(),
+                description: description.into(),
+            }],
+        }
+    }
+}
+
+impl QuotaFailure {
     pub fn add_violation(
         &mut self,
         subject: impl Into<String>,
@@ -35,17 +46,8 @@ impl QuotaFailure {
         self
     }
 
-    pub fn with_violation(subject: impl Into<String>, description: impl Into<String>) -> Self {
-        QuotaFailure {
-            violations: vec![Violation {
-                subject: subject.into(),
-                description: description.into(),
-            }],
-        }
-    }
-
-    pub fn has_violations(&self) -> bool {
-        self.violations.is_empty() == false
+    pub fn is_empty(&self) -> bool {
+        self.violations.is_empty()
     }
 }
 
@@ -101,7 +103,7 @@ mod tests {
 
     #[test]
     fn gen_quota_failure() {
-        let mut quota_failure = QuotaFailure::empty();
+        let mut quota_failure = QuotaFailure::new(Vec::new());
         let formatted = format!("{:?}", quota_failure);
 
         println!("empty QuotaFailure -> {formatted}");
@@ -114,8 +116,8 @@ mod tests {
         );
 
         assert!(
-            quota_failure.has_violations() == false,
-            "empty QuotaFailure returns 'true' from .has_violations()"
+            quota_failure.is_empty(),
+            "empty QuotaFailure returns 'false' from .is_empty()"
         );
 
         quota_failure
@@ -134,8 +136,8 @@ mod tests {
         );
 
         assert!(
-            quota_failure.has_violations() == true,
-            "filled QuotaFailure returns 'false' from .has_violations()"
+            quota_failure.is_empty() == false,
+            "filled QuotaFailure returns 'true' from .is_empty()"
         );
 
         let gen_any = match quota_failure.into_any() {

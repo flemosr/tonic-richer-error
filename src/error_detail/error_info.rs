@@ -16,31 +16,20 @@ pub struct ErrorInfo {
 impl ErrorInfo {
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.ErrorInfo";
 
-    pub fn empty() -> Self {
-        ErrorInfo {
-            reason: String::from(""),
-            domain: String::from(""),
-            metadata: HashMap::new(),
-        }
-    }
-
-    pub fn with_data(
+    pub fn new(
         reason: impl Into<String>,
         domain: impl Into<String>,
-        metadata: HashMap<impl Into<String>, impl Into<String>>,
+        metadata: HashMap<String, String>,
     ) -> Self {
-        let mut proc_metadata: HashMap<String, String> = HashMap::new();
-        for (key, value) in metadata.into_iter() {
-            proc_metadata.insert(key.into(), value.into());
-        }
-
         ErrorInfo {
             reason: reason.into(),
             domain: domain.into(),
-            metadata: proc_metadata,
+            metadata: metadata,
         }
     }
+}
 
+impl ErrorInfo {
     pub fn is_empty(&self) -> bool {
         self.reason.is_empty() && self.domain.is_empty() && self.metadata.is_empty()
     }
@@ -90,22 +79,10 @@ mod tests {
 
     #[test]
     fn gen_error_info() {
-        let error_info = ErrorInfo::empty();
-        let formatted = format!("{:?}", error_info);
-
-        println!("empty ErrorInfo -> {formatted}");
-
-        let expected = "ErrorInfo { reason: \"\", domain: \"\", metadata: {} }";
-
-        assert!(
-            formatted.eq(expected),
-            "empty ErrorInfo differs from expected result"
-        );
-
         let mut metadata = HashMap::new();
-        metadata.insert("instanceLimitPerRequest", "100");
+        metadata.insert("instanceLimitPerRequest".to_string(), "100".into());
 
-        let error_info = ErrorInfo::with_data("SOME_INFO", "mydomain.com", metadata);
+        let error_info = ErrorInfo::new("SOME_INFO", "mydomain.com", metadata);
 
         let formatted = format!("{:?}", error_info);
 
@@ -122,6 +99,7 @@ mod tests {
             Err(error) => panic!("Error generating Any from ErrorInfo: {:?}", error),
             Ok(gen_any) => gen_any,
         };
+
         let formatted = format!("{:?}", gen_any);
 
         println!("Any generated from ErrorInfo -> {formatted}");
