@@ -4,21 +4,38 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
+/// Used to setup the `violations` field of the `PreconditionFailure` struct.
 #[derive(Clone, Debug)]
-pub struct Violation {
+pub struct PreconditionViolation {
     pub r#type: String,
     pub subject: String,
     pub description: String,
 }
+
+impl PreconditionViolation {
+    pub fn new(
+        r#type: impl Into<String>,
+        subject: impl Into<String>,
+        description: impl Into<String>,
+    ) -> Self {
+        PreconditionViolation {
+            r#type: r#type.into(),
+            subject: subject.into(),
+            description: description.into(),
+        }
+    }
+}
+
+/// Used to encode/decode the `PreconditionFailure` standard error message.
 #[derive(Clone, Debug)]
 pub struct PreconditionFailure {
-    pub violations: Vec<Violation>,
+    pub violations: Vec<PreconditionViolation>,
 }
 
 impl PreconditionFailure {
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.PreconditionFailure";
 
-    pub fn new(violations: Vec<Violation>) -> Self {
+    pub fn new(violations: Vec<PreconditionViolation>) -> Self {
         PreconditionFailure {
             violations: violations,
         }
@@ -30,7 +47,7 @@ impl PreconditionFailure {
         description: impl Into<String>,
     ) -> Self {
         PreconditionFailure {
-            violations: vec![Violation {
+            violations: vec![PreconditionViolation {
                 r#type: violation_type.into(),
                 subject: subject.into(),
                 description: description.into(),
@@ -46,7 +63,7 @@ impl PreconditionFailure {
         subject: impl Into<String>,
         description: impl Into<String>,
     ) -> &mut Self {
-        self.violations.append(&mut vec![Violation {
+        self.violations.append(&mut vec![PreconditionViolation {
             r#type: r#type.into(),
             subject: subject.into(),
             description: description.into(),
@@ -93,7 +110,7 @@ impl FromAny for PreconditionFailure {
             violations: precondition_failure
                 .violations
                 .into_iter()
-                .map(|v| Violation {
+                .map(|v| PreconditionViolation {
                     r#type: v.r#type,
                     subject: v.subject,
                     description: v.description,
@@ -138,7 +155,7 @@ mod tests {
 
         println!("filled PreconditionFailure -> {formatted}");
 
-        let expected_filled = "PreconditionFailure { violations: [Violation { type: \"TOS\", subject: \"example.local\", description: \"Terms of service not accepted\" }, Violation { type: \"FNF\", subject: \"example.local\", description: \"File not found\" }] }";
+        let expected_filled = "PreconditionFailure { violations: [PreconditionViolation { type: \"TOS\", subject: \"example.local\", description: \"Terms of service not accepted\" }, PreconditionViolation { type: \"FNF\", subject: \"example.local\", description: \"File not found\" }] }";
 
         assert!(
             formatted.eq(expected_filled),

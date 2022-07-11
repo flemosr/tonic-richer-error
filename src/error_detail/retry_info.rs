@@ -6,6 +6,7 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
+/// Used to encode/decode the `RetryInfo` standard error message.
 #[derive(Clone, Debug)]
 pub struct RetryInfo {
     pub retry_delay: Option<time::Duration>,

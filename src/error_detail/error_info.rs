@@ -6,6 +6,7 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
+/// Used to encode/decode the `ErrorInfo` standard error message.
 #[derive(Clone, Debug)]
 pub struct ErrorInfo {
     pub reason: String,

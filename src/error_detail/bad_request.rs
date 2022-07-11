@@ -4,12 +4,23 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
+/// Used to setup the `field_violations` field of the `BadRequest` struct.
 #[derive(Clone, Debug)]
 pub struct FieldViolation {
     pub field: String,
     pub description: String,
 }
 
+impl FieldViolation {
+    pub fn new(field: impl Into<String>, description: impl Into<String>) -> Self {
+        FieldViolation {
+            field: field.into(),
+            description: description.into(),
+        }
+    }
+}
+
+/// Used to encode/decode the `BadRequest` standard error message.
 #[derive(Clone, Debug)]
 pub struct BadRequest {
     pub field_violations: Vec<FieldViolation>,

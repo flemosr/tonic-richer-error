@@ -4,26 +4,38 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
+/// Used to setup the `links` field of the `Help` struct.
 #[derive(Clone, Debug)]
-pub struct Link {
+pub struct HelpLink {
     pub description: String,
     pub url: String,
 }
+
+impl HelpLink {
+    pub fn new(description: impl Into<String>, url: impl Into<String>) -> Self {
+        HelpLink {
+            description: description.into(),
+            url: url.into(),
+        }
+    }
+}
+
+/// Used to encode/decode the `Help` standard error message.
 #[derive(Clone, Debug)]
 pub struct Help {
-    pub links: Vec<Link>,
+    pub links: Vec<HelpLink>,
 }
 
 impl Help {
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.Help";
 
-    pub fn new(links: Vec<Link>) -> Self {
+    pub fn new(links: Vec<HelpLink>) -> Self {
         Help { links }
     }
 
     pub fn with_link(description: impl Into<String>, url: impl Into<String>) -> Self {
         Help {
-            links: vec![Link {
+            links: vec![HelpLink {
                 description: description.into(),
                 url: url.into(),
             }],
@@ -37,7 +49,7 @@ impl Help {
         description: impl Into<String>,
         url: impl Into<String>,
     ) -> &mut Self {
-        self.links.append(&mut vec![Link {
+        self.links.append(&mut vec![HelpLink {
             description: description.into(),
             url: url.into(),
         }]);
@@ -82,7 +94,7 @@ impl FromAny for Help {
             links: help
                 .links
                 .into_iter()
-                .map(|v| Link {
+                .map(|v| HelpLink {
                     description: v.description,
                     url: v.url,
                 })
@@ -125,7 +137,7 @@ mod tests {
 
         println!("filled Help -> {formatted}");
 
-        let expected_filled = "Help { links: [Link { description: \"link to resource a\", url: \"resource-a.example.local\" }, Link { description: \"link to resource b\", url: \"resource-b.example.local\" }] }";
+        let expected_filled = "Help { links: [HelpLink { description: \"link to resource a\", url: \"resource-a.example.local\" }, HelpLink { description: \"link to resource b\", url: \"resource-b.example.local\" }] }";
 
         assert!(
             formatted.eq(expected_filled),

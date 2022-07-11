@@ -4,6 +4,7 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
+/// Used to encode/decode the `RequestInfo` standard error message.
 #[derive(Clone, Debug)]
 pub struct RequestInfo {
     pub request_id: String,

@@ -8,7 +8,7 @@ pub use debug_info::DebugInfo;
 
 mod quota_failure;
 
-pub use quota_failure::{QuotaFailure, Violation as QuotaViolation};
+pub use quota_failure::{QuotaFailure, QuotaViolation};
 
 mod error_info;
 
@@ -16,7 +16,7 @@ pub use error_info::ErrorInfo;
 
 mod prec_failure;
 
-pub use prec_failure::{PreconditionFailure, Violation as PreconditionViolation};
+pub use prec_failure::{PreconditionFailure, PreconditionViolation};
 
 mod bad_request;
 
@@ -32,7 +32,7 @@ pub use resource_info::ResourceInfo;
 
 mod help;
 
-pub use help::{Help, Link as HelpLink};
+pub use help::{Help, HelpLink};
 
 mod loc_message;
 

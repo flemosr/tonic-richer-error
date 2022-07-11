@@ -4,6 +4,7 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
+/// Used to encode/decode the `LocalizedMessage` standard error message.
 #[derive(Clone, Debug)]
 pub struct LocalizedMessage {
     pub locale: String,

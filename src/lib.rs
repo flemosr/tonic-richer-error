@@ -1,3 +1,123 @@
+/*!
+This crate introduces the `WithErrorDetails` trait and implements it in
+`tonic::Status`, allowing the implementation of the
+[gRPC Richer Error Model](https://www.grpc.io/docs/guides/error/) with
+[tonic](https://docs.rs/tonic/latest/tonic/) in a convenient way.
+
+# Usage
+The `WithErrorDetails` trait adds associated functions to `tonic::Status` that
+can be used on the server side to create a status with error details, that can
+then be returned to the gRPC client. Moreover, the trait also adds methods
+to `tonic::Status` that can be used by a tonic client to extract error details,
+and handle them with ease.
+
+# Getting Started
+```toml
+[dependencies]
+tonic-richer-error = "0.2.0"
+```
+
+# Examples
+The examples bellow cover a basic use case. A more complete server and client
+implementation can be found at [github](https://github.com/flemosr/tonic-richer-error).
+
+## Server Side: Generating `tonic::Status` with an `ErrorDetails` struct
+```
+use tonic::{Code, Status};
+use tonic_richer_error::{ErrorDetails, WithErrorDetails};
+
+// ... inside a gRPC server endpoint method that returns Result<Response<PbRes>, Status>
+
+// Create empty ErrorDetails struct
+let mut err_details = ErrorDetails::new();
+
+// Add error details conditionally
+if true {
+    err_details.add_bad_request_violation(
+        "field_a",
+        "description of why the field_a is invalid"
+    );
+}
+
+if true {
+    err_details.add_bad_request_violation(
+        "field_b",
+        "description of why the field_b is invalid",
+    );
+}
+
+// Check if any error details were set and return error status if so
+if err_details.has_bad_request_violations() {
+
+    // Add aditional error details if necessary
+    err_details
+        .add_help_link("description of link", "https://resource.example.local")
+        .set_localized_message("en-US", "message for the user");
+
+    let status = Status::with_error_details(
+        Code::InvalidArgument,
+        "bad request",
+        err_details,
+    )
+    .unwrap();
+
+    // Here the status would be returned. Omitted to avoid breaking tests
+    // return Err(status);
+}
+
+// Deal with valid request
+
+// ...
+
+```
+
+## Client Side: Extracting an `ErrorDetails` struct from `tonic::Status`
+```
+use tonic::{Response, Status};
+use tonic_richer_error::{WithErrorDetails};
+
+// ... where req_result is returned by a tonic::Client endpoint method
+
+fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    match req_result {
+        Ok(_) => {
+            // deal with valid response
+        },
+        Err(status) => {
+            let err_details = status.get_error_details().unwrap();
+            if let Some(bad_request) = err_details.bad_request {
+                // deal with bad_request details
+            }
+            if let Some(help) = err_details.help {
+                // deal with help details
+            }
+            if let Some(localized_message) = err_details.localized_message {
+                // deal with localized_message details
+            }
+        }
+    };
+}
+```
+
+## Setup different standard error messages
+Multiple examples are provided at the [ErrorDetails](struct.ErrorDetails.html)
+docs. The [standard error messages](https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto)
+provide instructions about how to setup the messages fields correctly.
+
+## Alternative `tonic::Status` associated functions and methods
+The [WithErrorDetails](trait.WithErrorDetails.html) docs provide examples with
+an alternative way of interacting with `tonic::Status` using vectors of
+standard error messages directly (
+[::with_error_details_vec](trait.WithErrorDetails.html#tymethod.with_error_details_vec),
+[.get_error_details_vec](trait.WithErrorDetails.html#tymethod.get_error_details_vec)
+), which can provide more control over the final error details vector if
+necessary. Besides that, multiple examples with alternative error detail
+extration methods are provided, which can be useful if only one kind of error
+detail is being used, for example: [.get_details_bad_request](trait.WithErrorDetails.html#tymethod.get_details_bad_request).
+
+
+*/
+
 use prost::{DecodeError, EncodeError, Message};
 use prost_types::Any;
 use tonic::{codegen::Bytes, Code, Status};
@@ -26,41 +146,297 @@ trait FromAny {
         Self: Sized;
 }
 
+/// Adds the crate core functionality to `tonic::Status`.
 pub trait WithErrorDetails {
+    /// Generates a `tonic::Status` with error details obtained from an
+    /// `ErrorDetails` struct.
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Code, Status};
+    /// use tonic_richer_error::{ErrorDetails, WithErrorDetails};
+    ///
+    /// let status = Status::with_error_details(
+    ///     Code::InvalidArgument,
+    ///     "bad request",
+    ///     ErrorDetails::with_bad_request_violation("field", "description"),
+    /// )
+    /// .unwrap();
+    /// ```
     fn with_error_details(
         code: tonic::Code,
         message: impl Into<String>,
         details: ErrorDetails,
     ) -> Result<Status, EncodeError>;
 
+    /// Generates a `tonic::Status` with error details provided in a vector of
+    /// `ErrorDetail` enums.
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Code, Status};
+    /// use tonic_richer_error::{BadRequest, WithErrorDetails};
+    ///
+    /// let status = Status::with_error_details_vec(
+    ///     Code::InvalidArgument,
+    ///     "bad request",
+    ///     vec![
+    ///         BadRequest::with_violation("field", "description").into(),
+    ///     ]
+    /// )
+    /// .unwrap();
+    /// ```
     fn with_error_details_vec(
         code: tonic::Code,
         message: impl Into<String>,
         details: Vec<ErrorDetail>,
     ) -> Result<Status, EncodeError>;
 
+    /// Get an `ErrorDetails` struct from a `tonic::Status`.
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Status, Response};
+    /// use tonic_richer_error::{WithErrorDetails};
+    ///
+    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    ///     match req_result {
+    ///         Ok(_) => {},
+    ///         Err(status) => {
+    ///             let err_details = status.get_error_details().unwrap();
+    ///             if let Some(bad_request) = err_details.bad_request {
+    ///                 // deal with bad_request details
+    ///             }
+    ///         }
+    ///     };
+    /// }
+    /// ```
     fn get_error_details(&self) -> Result<ErrorDetails, DecodeError>;
 
+    /// Get a vector of `ErrorDetail` enums from a `tonic::Status`.
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Status, Response};
+    /// use tonic_richer_error::{ErrorDetail, WithErrorDetails};
+    ///
+    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    ///     match req_result {
+    ///         Ok(_) => {},
+    ///         Err(status) => {
+    ///             let err_details = status.get_error_details_vec().unwrap();
+    ///             for (i, err_detail) in err_details.iter().enumerate() {
+    ///                  match err_detail {
+    ///                     ErrorDetail::BadRequest(bad_request) => {
+    ///                         // deal with bad_request details
+    ///                     }
+    ///                     _ => {}
+    ///                  }
+    ///             }
+    ///         }
+    ///     };
+    /// }
+    /// ```
     fn get_error_details_vec(&self) -> Result<Vec<ErrorDetail>, DecodeError>;
 
+    /// Get first `RetryInfo` details found on a `tonic::Status`.
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Status, Response};
+    /// use tonic_richer_error::{WithErrorDetails};
+    ///
+    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    ///     match req_result {
+    ///         Ok(_) => {},
+    ///         Err(status) => {
+    ///             if let Some(retry_info) = status.get_details_retry_info() {
+    ///                 // deal with retry_info details
+    ///             }
+    ///         }
+    ///     };
+    /// }
+    /// ```
     fn get_details_retry_info(&self) -> Option<RetryInfo>;
 
+    /// Get first `DebugInfo` details found on a `tonic::Status`.
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Status, Response};
+    /// use tonic_richer_error::{WithErrorDetails};
+    ///
+    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    ///     match req_result {
+    ///         Ok(_) => {},
+    ///         Err(status) => {
+    ///             if let Some(debug_info) = status.get_details_debug_info() {
+    ///                 // deal with debug_info details
+    ///             }
+    ///         }
+    ///     };
+    /// }
+    /// ```
     fn get_details_debug_info(&self) -> Option<DebugInfo>;
 
+    /// Get first `QuotaFailure` details found on a `tonic::Status`.
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Status, Response};
+    /// use tonic_richer_error::{WithErrorDetails};
+    ///
+    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    ///     match req_result {
+    ///         Ok(_) => {},
+    ///         Err(status) => {
+    ///             if let Some(quota_failure) = status.get_details_quota_failure() {
+    ///                 // deal with quota_failure details
+    ///             }
+    ///         }
+    ///     };
+    /// }
+    /// ```
     fn get_details_quota_failure(&self) -> Option<QuotaFailure>;
 
+    /// Get first `ErrorInfo` details found on a `tonic::Status`.
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Status, Response};
+    /// use tonic_richer_error::{WithErrorDetails};
+    ///
+    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    ///     match req_result {
+    ///         Ok(_) => {},
+    ///         Err(status) => {
+    ///             if let Some(error_info) = status.get_details_error_info() {
+    ///                 // deal with error_info details
+    ///             }
+    ///         }
+    ///     };
+    /// }
+    /// ```
     fn get_details_error_info(&self) -> Option<ErrorInfo>;
 
+    /// Get first `PreconditionFailure` details found on a `tonic::Status`.
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Status, Response};
+    /// use tonic_richer_error::{WithErrorDetails};
+    ///
+    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    ///     match req_result {
+    ///         Ok(_) => {},
+    ///         Err(status) => {
+    ///             if let Some(precondition_failure) = status.get_details_precondition_failure() {
+    ///                 // deal with precondition_failure details
+    ///             }
+    ///         }
+    ///     };
+    /// }
+    /// ```
     fn get_details_precondition_failure(&self) -> Option<PreconditionFailure>;
 
+    /// Get first `BadRequest` details found on a `tonic::Status`.
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Status, Response};
+    /// use tonic_richer_error::{WithErrorDetails};
+    ///
+    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    ///     match req_result {
+    ///         Ok(_) => {},
+    ///         Err(status) => {
+    ///             if let Some(bad_request) = status.get_details_bad_request() {
+    ///                 // deal with bad_request details
+    ///             }
+    ///         }
+    ///     };
+    /// }
+    /// ```
     fn get_details_bad_request(&self) -> Option<BadRequest>;
 
+    /// Get first `RequestInfo` details found on a `tonic::Status`.
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Status, Response};
+    /// use tonic_richer_error::{WithErrorDetails};
+    ///
+    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    ///     match req_result {
+    ///         Ok(_) => {},
+    ///         Err(status) => {
+    ///             if let Some(request_info) = status.get_details_request_info() {
+    ///                 // deal with request_info details
+    ///             }
+    ///         }
+    ///     };
+    /// }
+    /// ```
     fn get_details_request_info(&self) -> Option<RequestInfo>;
 
+    /// Get first `ResourceInfo` details found on a `tonic::Status`.
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Status, Response};
+    /// use tonic_richer_error::{WithErrorDetails};
+    ///
+    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    ///     match req_result {
+    ///         Ok(_) => {},
+    ///         Err(status) => {
+    ///             if let Some(resource_info) = status.get_details_resource_info() {
+    ///                 // deal with resource_info details
+    ///             }
+    ///         }
+    ///     };
+    /// }
+    /// ```
     fn get_details_resource_info(&self) -> Option<ResourceInfo>;
 
+    /// Get first `Help` details found on a `tonic::Status`
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Status, Response};
+    /// use tonic_richer_error::{WithErrorDetails};
+    ///
+    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    ///     match req_result {
+    ///         Ok(_) => {},
+    ///         Err(status) => {
+    ///             if let Some(help) = status.get_details_help() {
+    ///                 // deal with help details
+    ///             }
+    ///         }
+    ///     };
+    /// }
+    /// ```
     fn get_details_help(&self) -> Option<Help>;
 
+    /// Get first `LocalizedMessage` details found on a `tonic::Status`.
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Status, Response};
+    /// use tonic_richer_error::{WithErrorDetails};
+    ///
+    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    ///     match req_result {
+    ///         Ok(_) => {},
+    ///         Err(status) => {
+    ///             if let Some(localized_message) = status.get_details_localized_message() {
+    ///                 // deal with localized_message details
+    ///             }
+    ///         }
+    ///     };
+    /// }
+    /// ```
     fn get_details_localized_message(&self) -> Option<LocalizedMessage>;
 }
 

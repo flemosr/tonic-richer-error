@@ -1,5 +1,7 @@
 use super::error_detail::*;
 
+/// Wraps the structs corresponding to the standard set of error message types,
+/// to allow the implementation and handling of vectors containing any of them.
 #[derive(Clone, Debug)]
 pub enum ErrorDetail {
     RetryInfo(RetryInfo),

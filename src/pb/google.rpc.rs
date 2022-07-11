@@ -1,3 +1,6 @@
+// Generated from https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
+// using https://github.com/neoeinstein/protoc-gen-prost
+//
 // @generated
 /// Describes when the clients can retry a failed request. Clients could ignore
 /// the recommendation here or retry when this information is missing from error

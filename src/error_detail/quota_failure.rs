@@ -4,20 +4,32 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
+/// Used to setup the `violations` field of the `QuotaFailure` struct.
 #[derive(Clone, Debug)]
-pub struct Violation {
+pub struct QuotaViolation {
     pub subject: String,
     pub description: String,
 }
+
+impl QuotaViolation {
+    pub fn new(subject: impl Into<String>, description: impl Into<String>) -> Self {
+        QuotaViolation {
+            subject: subject.into(),
+            description: description.into(),
+        }
+    }
+}
+
+/// Used to encode/decode the `QuotaFailure` standard error message.
 #[derive(Clone, Debug)]
 pub struct QuotaFailure {
-    pub violations: Vec<Violation>,
+    pub violations: Vec<QuotaViolation>,
 }
 
 impl QuotaFailure {
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.QuotaFailure";
 
-    pub fn new(violations: Vec<Violation>) -> Self {
+    pub fn new(violations: Vec<QuotaViolation>) -> Self {
         QuotaFailure {
             violations: violations,
         }
@@ -25,7 +37,7 @@ impl QuotaFailure {
 
     pub fn with_violation(subject: impl Into<String>, description: impl Into<String>) -> Self {
         QuotaFailure {
-            violations: vec![Violation {
+            violations: vec![QuotaViolation {
                 subject: subject.into(),
                 description: description.into(),
             }],
@@ -39,7 +51,7 @@ impl QuotaFailure {
         subject: impl Into<String>,
         description: impl Into<String>,
     ) -> &mut Self {
-        self.violations.append(&mut vec![Violation {
+        self.violations.append(&mut vec![QuotaViolation {
             subject: subject.into(),
             description: description.into(),
         }]);
@@ -84,7 +96,7 @@ impl FromAny for QuotaFailure {
             violations: quota_failure
                 .violations
                 .into_iter()
-                .map(|v| Violation {
+                .map(|v| QuotaViolation {
                     subject: v.subject,
                     description: v.description,
                 })
@@ -128,7 +140,7 @@ mod tests {
 
         println!("filled QuotaFailure -> {formatted}");
 
-        let expected_filled = "QuotaFailure { violations: [Violation { subject: \"clientip:<ip address>\", description: \"description a\" }, Violation { subject: \"project:<project id>\", description: \"description b\" }] }";
+        let expected_filled = "QuotaFailure { violations: [QuotaViolation { subject: \"clientip:<ip address>\", description: \"description a\" }, QuotaViolation { subject: \"project:<project id>\", description: \"description b\" }] }";
 
         assert!(
             formatted.eq(expected_filled),
