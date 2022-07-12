@@ -12,14 +12,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut client = ScheduleClient::connect("http://[::1]:50051").await?;
 
     let request = tonic::Request::new(DayInfoReq {
-        // day_code: "invalid code".into(),
-        day_code: "aaa".into(),
+        day_code: "invalid code".into(),
+        // day_code: "aaa".into(),
         // day_code: "mon".into(),
     });
+
+    println!("\n Making request...");
 
     let response = match client.day_info(request).await {
         Ok(response) => response,
         Err(status) => {
+            println!(" Error status received. Extracting error details...\n");
+
             let err_details = status.get_error_details().unwrap();
 
             if let Some(bad_request) = err_details.bad_request {
@@ -35,11 +39,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!(" {:?}", localized_message);
             }
 
+            println!("");
+
             return Ok(());
         }
     };
 
-    println!("RESPONSE={:?}", response);
+    println!(" Successfull response received.\n\n {:?}\n", response);
 
     Ok(())
 }

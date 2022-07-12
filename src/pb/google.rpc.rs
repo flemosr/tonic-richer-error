@@ -70,7 +70,7 @@ pub mod quota_failure {
         pub description: ::prost::alloc::string::String,
     }
 }
-/// ```ignore
+/// ```text
 /// Describes the cause of the error with structured details.
 ///
 /// Example of an error when contacting the "pubsub.googleapis.com" API when it

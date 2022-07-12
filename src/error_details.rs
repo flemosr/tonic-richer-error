@@ -2,8 +2,8 @@ use std::{collections::HashMap, time};
 
 use super::error_detail::*;
 
-/// Stores all error details that will be send to the client. Provides methods
-/// to setup and edit each detail independently.
+/// Stores all error details that will be send to the client. Provides associated
+/// functions and methods to setup and edit each detail independently.
 #[derive(Clone, Debug)]
 pub struct ErrorDetails {
     pub retry_info: Option<RetryInfo>,

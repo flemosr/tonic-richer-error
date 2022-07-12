@@ -1,8 +1,9 @@
 /*!
+Assets for implementation of the gRPC Richer Error Model with tonic.
+
 This crate introduces the `WithErrorDetails` trait and implements it in
-`tonic::Status`, allowing the implementation of the
-[gRPC Richer Error Model](https://www.grpc.io/docs/guides/error/) with
-[tonic](https://docs.rs/tonic/latest/tonic/) in a convenient way.
+`tonic::Status`, allowing the implementation of the [gRPC Richer Error Model]
+with [tonic] in a convenient way.
 
 # Usage
 The `WithErrorDetails` trait adds associated functions to `tonic::Status` that
@@ -14,12 +15,13 @@ and handle them with ease.
 # Getting Started
 ```toml
 [dependencies]
-tonic-richer-error = "0.2.0"
+tonic = "0.7"
+tonic-richer-error = "0.2"
 ```
 
 # Examples
-The examples bellow cover a basic use case. A more complete server and client
-implementation can be found at [github](https://github.com/flemosr/tonic-richer-error).
+The examples bellow cover a basic use case. More complete server and client
+implementations can be found at the [github examples] directory.
 
 ## Server Side: Generating `tonic::Status` with an `ErrorDetails` struct
 ```
@@ -100,22 +102,29 @@ fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
 ```
 
 ## Setup different standard error messages
-Multiple examples are provided at the [ErrorDetails](struct.ErrorDetails.html)
-docs. The [standard error messages](https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto)
-provide instructions about how to setup the messages fields correctly.
+Multiple examples are provided at the [ErrorDetails section] of the docs.
+Instructions about how to setup the messages fields correctly are provided at
+[standard error messages].
 
 ## Alternative `tonic::Status` associated functions and methods
-The [WithErrorDetails](trait.WithErrorDetails.html) docs provide examples with
-an alternative way of interacting with `tonic::Status` using vectors of
-standard error messages directly (
-[::with_error_details_vec](trait.WithErrorDetails.html#tymethod.with_error_details_vec),
-[.get_error_details_vec](trait.WithErrorDetails.html#tymethod.get_error_details_vec)
-), which can provide more control over the final error details vector if
-necessary. Besides that, multiple examples with alternative error detail
-extration methods are provided, which can be useful if only one kind of error
-detail is being used, for example: [.get_details_bad_request](trait.WithErrorDetails.html#tymethod.get_details_bad_request).
+In the [WithErrorDetails section] of the docs, an alternative way of interacting
+with `tonic::Status` is presented, using vectors of standard error messages
+directly ([::with_error_details_vec], [.get_error_details_vec]). This approach
+can provide more control over the final error details vector if necessary, and
+is also presented at the [github examples] directory.
+Besides that, multiple examples with alternative error detail extration methods
+are provided in the docs, which can be useful if only one kind of error detail
+is being used, for example: [.get_details_bad_request].
 
-
+[gRPC Richer Error Model]: https://www.grpc.io/docs/guides/error/
+[tonic]: https://docs.rs/tonic/latest/tonic/
+[github examples]: https://github.com/flemosr/tonic-richer-error/tree/main/examples
+[standard error messages]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
+[ErrorDetails section]: struct.ErrorDetails.html
+[WithErrorDetails section]: trait.WithErrorDetails.html
+[::with_error_details_vec]: trait.WithErrorDetails.html#tymethod.with_error_details_vec
+[.get_error_details_vec]: trait.WithErrorDetails.html#tymethod.get_error_details_vec
+[.get_details_bad_request]: trait.WithErrorDetails.html#tymethod.get_details_bad_request
 */
 
 use prost::{DecodeError, EncodeError, Message};
