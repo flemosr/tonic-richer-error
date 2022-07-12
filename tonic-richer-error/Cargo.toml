@@ -25,19 +25,3 @@ tonic-build = "0.7"
 
 [build-dependencies]
 prost-build = "0.10"
-
-[[example]]
-name = "badreq-server"
-path = "examples/badreq/server.rs"
-
-[[example]]
-name = "badreq-client"
-path = "examples/badreq/client.rs"
-
-[[example]]
-name = "badreq-server-vec"
-path = "examples/badreq/server_vec.rs"
-
-[[example]]
-name = "badreq-client-vec"
-path = "examples/badreq/client_vec.rs"

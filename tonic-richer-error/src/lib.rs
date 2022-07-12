@@ -135,11 +135,11 @@ mod pb {
     include!(concat!(env!("OUT_DIR"), "/google.rpc.rs"));
 }
 
-mod error_detail;
 mod error_details;
 mod error_details_vec;
+mod std_messages;
 
-pub use error_detail::*;
+pub use std_messages::*;
 
 pub use error_details::ErrorDetails;
 

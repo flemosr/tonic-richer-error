@@ -1,6 +1,6 @@
 use std::{collections::HashMap, time};
 
-use super::error_detail::*;
+use super::std_messages::*;
 
 /// Stores all error details that will be send to the client. Provides associated
 /// functions and methods to setup and edit each detail independently.

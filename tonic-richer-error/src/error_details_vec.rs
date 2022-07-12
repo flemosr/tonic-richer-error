@@ -1,4 +1,4 @@
-use super::error_detail::*;
+use super::std_messages::*;
 
 /// Wraps the structs corresponding to the standard set of error message types,
 /// to allow the implementation and handling of vectors containing any of them.
