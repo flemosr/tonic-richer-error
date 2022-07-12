@@ -1,8 +1,8 @@
 use tonic::{transport::Server, Code, Request, Response, Status};
-use tonic_richer_error::{BadRequest, Help, LocalizedMessage, WithErrorDetails};
+use tonic_richer_error::{ErrorDetails, WithErrorDetails};
 
 mod pb {
-    include!("./pb/schedule.rs");
+    include!(concat!(env!("OUT_DIR"), "/schedule.rs"));
 }
 
 use pb::schedule_server::{Schedule, ScheduleServer};
@@ -19,30 +19,29 @@ impl Schedule for MySchedule {
         // Extract request data
         let day_code = request.into_inner().day_code.to_lowercase();
 
-        // Create empty BadRequest struct
-        let mut bad_request = BadRequest::new(vec![]);
+        // Create empty ErrorDetails struct
+        let mut err_details = ErrorDetails::new();
 
-        // Add violations conditionally
+        // Add error details conditionally
         if day_code.len() != 3 {
-            bad_request.add_violation("day_code", "must consist of three characters");
+            err_details.add_bad_request_violation("day_code", "must consist of three characters");
         }
 
         if !["mon", "tue", "wed", "thu", "fri", "sat", "sun"].contains(&day_code.as_str()) {
-            bad_request.add_violation("day_code", "code not recognized");
+            err_details.add_bad_request_violation("day_code", "code not recognized");
         }
 
-        if !bad_request.is_empty() {
+        if err_details.has_bad_request_violations() {
             // Add aditional error details if necessary
-
-            let help = Help::with_link("description of link", "https://resource.example.local");
-
-            let localized_message = LocalizedMessage::new("en-US", "message for the user");
+            err_details
+                .add_help_link("description of link", "https://resource.example.local")
+                .set_localized_message("en-US", "message for the user");
 
             // Generate error status
-            let status = Status::with_error_details_vec(
+            let status = Status::with_error_details(
                 Code::InvalidArgument,
                 "request not recognized",
-                vec![bad_request.into(), help.into(), localized_message.into()],
+                err_details,
             )
             .unwrap();
 

@@ -1,0 +1,43 @@
+[package]
+name = "tonic-richer-error"
+authors = ["Rafael Lemos <flemos.rafael.dev@gmail.com>"]
+categories = ["web-programming", "network-programming"]
+description = """
+Assets for implementation of the gRPC Richer Error Model with tonic.
+"""
+edition = "2021"
+homepage = "https://github.com/flemosr/tonic-richer-error"
+keywords = ["rpc", "grpc", "async", "error", "grpc-error", "grpc-richer-error"]
+license = "MIT"
+readme = "../README.md"
+repository = "https://github.com/flemosr/tonic-richer-error"
+version = "0.2.0"
+
+[dependencies]
+tonic = "0.7"
+prost = "0.10"
+prost-types = "0.10.1"
+
+[dev-dependencies]
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
+tonic = { version = "0.7", features = ["compression"] }
+tonic-build = "0.7"
+
+[build-dependencies]
+prost-build = "0.10"
+
+[[example]]
+name = "badreq-server"
+path = "examples/badreq/server.rs"
+
+[[example]]
+name = "badreq-client"
+path = "examples/badreq/client.rs"
+
+[[example]]
+name = "badreq-server-vec"
+path = "examples/badreq/server_vec.rs"
+
+[[example]]
+name = "badreq-client-vec"
+path = "examples/badreq/client_vec.rs"

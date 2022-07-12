@@ -132,7 +132,7 @@ use prost_types::Any;
 use tonic::{codegen::Bytes, Code, Status};
 
 mod pb {
-    include!("./pb/google.rpc.rs");
+    include!(concat!(env!("OUT_DIR"), "/google.rpc.rs"));
 }
 
 mod error_detail;

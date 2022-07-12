@@ -1,11 +1,11 @@
+use tonic_richer_error::WithErrorDetails;
+
 mod pb {
-    include!("./pb/schedule.rs");
+    include!(concat!(env!("OUT_DIR"), "/schedule.rs"));
 }
 
 use pb::schedule_client::ScheduleClient;
 use pb::DayInfoReq;
-
-use tonic_richer_error::WithErrorDetails;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

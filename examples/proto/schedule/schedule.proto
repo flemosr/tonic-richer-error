@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package schedule;
+
+service Schedule {
+    rpc DayInfo(DayInfoReq) returns (DayInfoRes);
+}
+
+message DayInfoReq {
+    string day_code = 1;
+}
+
+message DayInfoRes {
+    string activity = 1;
+}
