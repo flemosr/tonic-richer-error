@@ -137,11 +137,11 @@ conditions.
 [tonic]: https://github.com/hyperium/tonic
 [Examples]: https://github.com/flemosr/tonic-richer-error/tree/main/examples
 [Website]: https://github.com/flemosr/tonic-richer-error
-[Docs]: https://docs.rs/tonic-richer-error/0.2.0/tonic_richer_error/
+[Docs]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/
 [examples]: https://github.com/flemosr/tonic-richer-error/tree/main/examples
 [standard error messages]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
-[ErrorDetails section]: https://docs.rs/tonic-richer-error/0.2.0/tonic_richer_error/struct.ErrorDetails.html
-[WithErrorDetails section]: https://docs.rs/tonic-richer-error/0.2.0/tonic_richer_error/trait.WithErrorDetails.html
-[::with_error_details_vec]: https://docs.rs/tonic-richer-error/0.2.0/tonic_richer_error/trait.WithErrorDetails.html#tymethod.with_error_details_vec
-[.get_error_details_vec]: https://docs.rs/tonic-richer-error/0.2.0/tonic_richer_error/trait.WithErrorDetails.html#tymethod.get_error_details_vec
-[.get_details_bad_request]: https://docs.rs/tonic-richer-error/0.2.0/tonic_richer_error/trait.WithErrorDetails.html#tymethod.get_details_bad_request
+[ErrorDetails section]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/struct.ErrorDetails.html
+[WithErrorDetails section]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/trait.WithErrorDetails.html
+[::with_error_details_vec]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/trait.WithErrorDetails.html#tymethod.with_error_details_vec
+[.get_error_details_vec]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/trait.WithErrorDetails.html#tymethod.get_error_details_vec
+[.get_details_bad_request]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/trait.WithErrorDetails.html#tymethod.get_details_bad_request
