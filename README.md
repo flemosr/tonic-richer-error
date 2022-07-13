@@ -27,8 +27,8 @@ tonic-richer-error = "0.2"
 
 ## Examples
 
-The examples bellow cover a basic use case. A more complete server and client
-implementation can be found at the [examples] directory.
+The examples bellow cover a basic use case. More complete server and client
+implementations can be found at the [examples] directory.
 
 ### Server Side: Generating `tonic::Status` with an `ErrorDetails` struct
 ```rust
