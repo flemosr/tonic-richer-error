@@ -28,7 +28,8 @@ implementations can be found at the [github examples] directory.
 use tonic::{Code, Status};
 use tonic_richer_error::{ErrorDetails, WithErrorDetails};
 
-// ... inside a gRPC server endpoint method that returns Result<Response<PbRes>, Status>
+// ...
+// (inside a gRPC server endpoint that returns Result<Response<PbRes>, Status>)
 
 // Create empty ErrorDetails struct
 let mut err_details = ErrorDetails::new();
@@ -51,7 +52,7 @@ if true {
 // Check if any error details were set and return error status if so
 if err_details.has_bad_request_violations() {
 
-    // Add aditional error details if necessary
+    // Add additional error details if necessary
     err_details
         .add_help_link("description of link", "https://resource.example.local")
         .set_localized_message("en-US", "message for the user");
@@ -67,10 +68,9 @@ if err_details.has_bad_request_violations() {
     // return Err(status);
 }
 
-// Deal with valid request
+// Handle valid request
 
 // ...
-
 ```
 
 ## Client Side: Extracting an `ErrorDetails` struct from `tonic::Status`
@@ -78,23 +78,24 @@ if err_details.has_bad_request_violations() {
 use tonic::{Response, Status};
 use tonic_richer_error::{WithErrorDetails};
 
-// ... where req_result is returned by a tonic::Client endpoint method
+// ...
 
-fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+// Where req_result was returned by a tonic::Client endpoint method
+fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     match req_result {
         Ok(_) => {
-            // deal with valid response
+            // Handle successful response
         },
         Err(status) => {
             let err_details = status.get_error_details().unwrap();
             if let Some(bad_request) = err_details.bad_request {
-                // deal with bad_request details
+                // Handle bad_request details
             }
             if let Some(help) = err_details.help {
-                // deal with help details
+                // Handle help details
             }
             if let Some(localized_message) = err_details.localized_message {
-                // deal with localized_message details
+                // Handle localized_message details
             }
         }
     };
@@ -208,13 +209,13 @@ pub trait WithErrorDetails {
     /// use tonic::{Status, Response};
     /// use tonic_richer_error::{WithErrorDetails};
     ///
-    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    /// fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     ///     match req_result {
     ///         Ok(_) => {},
     ///         Err(status) => {
     ///             let err_details = status.get_error_details().unwrap();
     ///             if let Some(bad_request) = err_details.bad_request {
-    ///                 // deal with bad_request details
+    ///                 // Handle bad_request details
     ///             }
     ///         }
     ///     };
@@ -229,7 +230,7 @@ pub trait WithErrorDetails {
     /// use tonic::{Status, Response};
     /// use tonic_richer_error::{ErrorDetail, WithErrorDetails};
     ///
-    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    /// fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     ///     match req_result {
     ///         Ok(_) => {},
     ///         Err(status) => {
@@ -237,7 +238,7 @@ pub trait WithErrorDetails {
     ///             for (i, err_detail) in err_details.iter().enumerate() {
     ///                  match err_detail {
     ///                     ErrorDetail::BadRequest(bad_request) => {
-    ///                         // deal with bad_request details
+    ///                         // Handle bad_request details
     ///                     }
     ///                     _ => {}
     ///                  }
@@ -255,12 +256,12 @@ pub trait WithErrorDetails {
     /// use tonic::{Status, Response};
     /// use tonic_richer_error::{WithErrorDetails};
     ///
-    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    /// fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     ///     match req_result {
     ///         Ok(_) => {},
     ///         Err(status) => {
     ///             if let Some(retry_info) = status.get_details_retry_info() {
-    ///                 // deal with retry_info details
+    ///                 // Handle retry_info details
     ///             }
     ///         }
     ///     };
@@ -275,12 +276,12 @@ pub trait WithErrorDetails {
     /// use tonic::{Status, Response};
     /// use tonic_richer_error::{WithErrorDetails};
     ///
-    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    /// fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     ///     match req_result {
     ///         Ok(_) => {},
     ///         Err(status) => {
     ///             if let Some(debug_info) = status.get_details_debug_info() {
-    ///                 // deal with debug_info details
+    ///                 // Handle debug_info details
     ///             }
     ///         }
     ///     };
@@ -295,12 +296,12 @@ pub trait WithErrorDetails {
     /// use tonic::{Status, Response};
     /// use tonic_richer_error::{WithErrorDetails};
     ///
-    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    /// fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     ///     match req_result {
     ///         Ok(_) => {},
     ///         Err(status) => {
     ///             if let Some(quota_failure) = status.get_details_quota_failure() {
-    ///                 // deal with quota_failure details
+    ///                 // Handle quota_failure details
     ///             }
     ///         }
     ///     };
@@ -315,12 +316,12 @@ pub trait WithErrorDetails {
     /// use tonic::{Status, Response};
     /// use tonic_richer_error::{WithErrorDetails};
     ///
-    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    /// fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     ///     match req_result {
     ///         Ok(_) => {},
     ///         Err(status) => {
     ///             if let Some(error_info) = status.get_details_error_info() {
-    ///                 // deal with error_info details
+    ///                 // Handle error_info details
     ///             }
     ///         }
     ///     };
@@ -335,12 +336,12 @@ pub trait WithErrorDetails {
     /// use tonic::{Status, Response};
     /// use tonic_richer_error::{WithErrorDetails};
     ///
-    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    /// fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     ///     match req_result {
     ///         Ok(_) => {},
     ///         Err(status) => {
     ///             if let Some(precondition_failure) = status.get_details_precondition_failure() {
-    ///                 // deal with precondition_failure details
+    ///                 // Handle precondition_failure details
     ///             }
     ///         }
     ///     };
@@ -355,12 +356,12 @@ pub trait WithErrorDetails {
     /// use tonic::{Status, Response};
     /// use tonic_richer_error::{WithErrorDetails};
     ///
-    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    /// fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     ///     match req_result {
     ///         Ok(_) => {},
     ///         Err(status) => {
     ///             if let Some(bad_request) = status.get_details_bad_request() {
-    ///                 // deal with bad_request details
+    ///                 // Handle bad_request details
     ///             }
     ///         }
     ///     };
@@ -375,12 +376,12 @@ pub trait WithErrorDetails {
     /// use tonic::{Status, Response};
     /// use tonic_richer_error::{WithErrorDetails};
     ///
-    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    /// fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     ///     match req_result {
     ///         Ok(_) => {},
     ///         Err(status) => {
     ///             if let Some(request_info) = status.get_details_request_info() {
-    ///                 // deal with request_info details
+    ///                 // Handle request_info details
     ///             }
     ///         }
     ///     };
@@ -395,12 +396,12 @@ pub trait WithErrorDetails {
     /// use tonic::{Status, Response};
     /// use tonic_richer_error::{WithErrorDetails};
     ///
-    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    /// fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     ///     match req_result {
     ///         Ok(_) => {},
     ///         Err(status) => {
     ///             if let Some(resource_info) = status.get_details_resource_info() {
-    ///                 // deal with resource_info details
+    ///                 // Handle resource_info details
     ///             }
     ///         }
     ///     };
@@ -415,12 +416,12 @@ pub trait WithErrorDetails {
     /// use tonic::{Status, Response};
     /// use tonic_richer_error::{WithErrorDetails};
     ///
-    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    /// fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     ///     match req_result {
     ///         Ok(_) => {},
     ///         Err(status) => {
     ///             if let Some(help) = status.get_details_help() {
-    ///                 // deal with help details
+    ///                 // Handle help details
     ///             }
     ///         }
     ///     };
@@ -435,12 +436,12 @@ pub trait WithErrorDetails {
     /// use tonic::{Status, Response};
     /// use tonic_richer_error::{WithErrorDetails};
     ///
-    /// fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+    /// fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     ///     match req_result {
     ///         Ok(_) => {},
     ///         Err(status) => {
     ///             if let Some(localized_message) = status.get_details_localized_message() {
-    ///                 // deal with localized_message details
+    ///                 // Handle localized_message details
     ///             }
     ///         }
     ///     };

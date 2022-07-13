@@ -1,10 +1,15 @@
 # Tonic Richer Error
-
 Assets for implementation of the gRPC Richer Error Model with tonic.
 
 This crate introduces the `WithErrorDetails` trait and implements it in
 `tonic::Status`, allowing the implementation of the [gRPC Richer Error Model]
 with [tonic] in a convenient way.
+
+[![Crates.io](https://img.shields.io/crates/v/tonic-richer-error)](https://crates.io/crates/tonic-richer-error)
+[![Documentation](https://docs.rs/tonic-richer-error/badge.svg)](https://docs.rs/tonic-richer-error)
+[![Crates.io](https://img.shields.io/crates/l/tonic-richer-error)](LICENSE)
+
+[Examples] | [Website] | [Docs] 
 
 ## Usage
 The `WithErrorDetails` trait adds associated functions to `tonic::Status` that
@@ -30,7 +35,8 @@ implementation can be found at the [examples] directory.
 use tonic::{Code, Status};
 use tonic_richer_error::{ErrorDetails, WithErrorDetails};
 
-// ... inside a gRPC server endpoint method that returns Result<Response<PbRes>, Status>
+// ...
+// (inside a gRPC server endpoint that returns Result<Response<PbRes>, Status>)
 
 // Create empty ErrorDetails struct
 let mut err_details = ErrorDetails::new();
@@ -53,7 +59,7 @@ if other_condition {
 // Check if any error details were set and return error status if so
 if err_details.has_bad_request_violations() {
 
-    // Add aditional error details if necessary
+    // Add additional error details if necessary
     err_details
         .add_help_link("description of link", "https://resource.example.local")
         .set_localized_message("en-US", "message for the user");
@@ -68,10 +74,9 @@ if err_details.has_bad_request_violations() {
     return Err(status);
 }
 
-// Deal with valid request
+// Handle valid request
 
 // ...
-
 ```
 
 ### Client Side: Extracting an `ErrorDetails` struct from `tonic::Status`
@@ -79,23 +84,24 @@ if err_details.has_bad_request_violations() {
 use tonic::{Response, Status};
 use tonic_richer_error::{WithErrorDetails};
 
-// ... where req_result is returned by a tonic::Client endpoint method
+// ...
 
-fn handle_req_result<T>(req_result: Result<Response<T>, Status>) {
+// Where req_result was returned by a tonic::Client endpoint method
+fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     match req_result {
         Ok(_) => {
-            // deal with valid response
+            // Handle successful response
         },
         Err(status) => {
             let err_details = status.get_error_details().unwrap();
             if let Some(bad_request) = err_details.bad_request {
-                // deal with bad_request details
+                // Handle bad_request details
             }
             if let Some(help) = err_details.help {
-                // deal with help details
+                // Handle help details
             }
             if let Some(localized_message) = err_details.localized_message {
-                // deal with localized_message details
+                // Handle localized_message details
             }
         }
     };
@@ -129,10 +135,13 @@ conditions.
 
 [gRPC Richer Error Model]: https://www.grpc.io/docs/guides/error/
 [tonic]: https://github.com/hyperium/tonic
+[Examples]: https://github.com/flemosr/tonic-richer-error/tree/main/examples
+[Website]: https://github.com/flemosr/tonic-richer-error
+[Docs]: https://docs.rs/tonic-richer-error/0.2.0/tonic_richer_error/
 [examples]: https://github.com/flemosr/tonic-richer-error/tree/main/examples
 [standard error messages]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
-<!-- [ErrorDetails section]: struct.ErrorDetails.html
-[WithErrorDetails section]: trait.WithErrorDetails.html
-[::with_error_details_vec]: trait.WithErrorDetails.html#tymethod.with_error_details_vec
-[.get_error_details_vec]: trait.WithErrorDetails.html#tymethod.get_error_details_vec
-[.get_details_bad_request]: trait.WithErrorDetails.html#tymethod.get_details_bad_request -->
+[ErrorDetails section]: https://docs.rs/tonic-richer-error/0.2.0/tonic_richer_error/struct.ErrorDetails.html
+[WithErrorDetails section]: https://docs.rs/tonic-richer-error/0.2.0/tonic_richer_error/trait.WithErrorDetails.html
+[::with_error_details_vec]: https://docs.rs/tonic-richer-error/0.2.0/tonic_richer_error/trait.WithErrorDetails.html#tymethod.with_error_details_vec
+[.get_error_details_vec]: https://docs.rs/tonic-richer-error/0.2.0/tonic_richer_error/trait.WithErrorDetails.html#tymethod.get_error_details_vec
+[.get_details_bad_request]: https://docs.rs/tonic-richer-error/0.2.0/tonic_richer_error/trait.WithErrorDetails.html#tymethod.get_details_bad_request
