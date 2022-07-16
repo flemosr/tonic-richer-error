@@ -8,20 +8,20 @@ readme = "./README.md"
 version = "0.1.0"
 
 [[bin]]
-name = "badreq-server"
-path = "src/badreq/server.rs"
+name = "richer-error-client"
+path = "src/richer-error/client.rs"
 
 [[bin]]
-name = "badreq-client"
-path = "src/badreq/client.rs"
+name = "richer-error-server"
+path = "src/richer-error/server.rs"
 
 [[bin]]
-name = "badreq-server-vec"
-path = "src/badreq/server_vec.rs"
+name = "richer-error-client-vec"
+path = "src/richer-error/client_vec.rs"
 
 [[bin]]
-name = "badreq-client-vec"
-path = "src/badreq/client_vec.rs"
+name = "richer-error-server-vec"
+path = "src/richer-error/server_vec.rs"
 
 [dependencies]
 prost = "0.10"

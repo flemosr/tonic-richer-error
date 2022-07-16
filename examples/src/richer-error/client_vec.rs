@@ -1,25 +1,26 @@
 use tonic_richer_error::{ErrorDetail, WithErrorDetails};
 
-mod pb {
-    include!(concat!(env!("OUT_DIR"), "/schedule.rs"));
-}
+use hello_world::greeter_client::GreeterClient;
+use hello_world::HelloRequest;
 
-use pb::schedule_client::ScheduleClient;
-use pb::DayInfoReq;
+pub mod hello_world {
+    tonic::include_proto!("helloworld");
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = ScheduleClient::connect("http://[::1]:50051").await?;
+    let mut client = GreeterClient::connect("http://[::1]:50051").await?;
 
-    let request = tonic::Request::new(DayInfoReq {
-        day_code: "invalid code".into(),
-        // day_code: "aaa".into(),
-        // day_code: "mon".into(),
+    let request = tonic::Request::new(HelloRequest {
+        // Valid request
+        // name: "Tonic".into(),
+        // Name cannot be empty
+        name: "".into(),
+        // Name is too long
+        // name: "some excessively long name".into(),
     });
 
-    println!("\n Making request...");
-
-    let response = match client.day_info(request).await {
+    let response = match client.say_hello(request).await {
         Ok(response) => response,
         Err(status) => {
             println!(" Error status received. Extracting error details...\n");
@@ -30,20 +31,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 println!("err_detail[{i}]");
                 match err_detail {
                     ErrorDetail::BadRequest(bad_request) => {
-                        // deal with bad_request details
+                        // Handle bad_request details
                         println!(" {:?}", bad_request);
                     }
                     ErrorDetail::Help(help) => {
-                        // deal with help details
+                        // Handle help details
                         println!(" {:?}", help);
                     }
                     ErrorDetail::LocalizedMessage(localized_message) => {
-                        // deal with localized_message details
+                        // Handle localized_message details
                         println!(" {:?}", localized_message);
                     }
-                    _ => {
-                        // ignore different error details
-                    }
+                    _ => {}
                 }
             }
 
