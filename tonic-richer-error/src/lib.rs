@@ -102,30 +102,32 @@ fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
 }
 ```
 
-## Setup different standard error messages
-Multiple examples are provided at the [ErrorDetails section] of the docs.
-Instructions about how to setup the messages fields correctly are provided at
+## Send different standard error messages
+Multiple examples are provided at the [`ErrorDetails`] doc. Instructions about
+how to setup the messages fields correctly are provided at
 [standard error messages].
 
 ## Alternative `tonic::Status` associated functions and methods
-In the [WithErrorDetails section] of the docs, an alternative way of interacting
-with `tonic::Status` is presented, using vectors of standard error messages
-directly ([::with_error_details_vec], [.get_error_details_vec]). This approach
-can provide more control over the final error details vector if necessary, and
-is also presented at the [github examples] directory.
+In the [`WithErrorDetails`] doc, an alternative way of interacting with
+`tonic::Status` is presented, using vectors of standard error messages
+directly. This approach can provide more control over the final error details
+vector if necessary. To see how to adopt this approach, please check the
+[`::with_error_details_vec`] and [`.get_error_details_vec`] docs, and also the
+[github examples] directory.\
 Besides that, multiple examples with alternative error detail extration methods
-are provided in the docs, which can be useful if only one kind of error detail
-is being used, for example: [.get_details_bad_request].
+are provided in the [`WithErrorDetails`] doc, which can be specially useful if
+only one kind of error detail is being used. For example:
+[`.get_details_bad_request`].
 
 [gRPC Richer Error Model]: https://www.grpc.io/docs/guides/error/
 [tonic]: https://docs.rs/tonic/latest/tonic/
 [github examples]: https://github.com/flemosr/tonic-richer-error/tree/main/examples
 [standard error messages]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
-[ErrorDetails section]: struct.ErrorDetails.html
-[WithErrorDetails section]: trait.WithErrorDetails.html
-[::with_error_details_vec]: trait.WithErrorDetails.html#tymethod.with_error_details_vec
-[.get_error_details_vec]: trait.WithErrorDetails.html#tymethod.get_error_details_vec
-[.get_details_bad_request]: trait.WithErrorDetails.html#tymethod.get_details_bad_request
+[`ErrorDetails`]: struct.ErrorDetails.html
+[`WithErrorDetails`]: trait.WithErrorDetails.html
+[`::with_error_details_vec`]: trait.WithErrorDetails.html#tymethod.with_error_details_vec
+[`.get_error_details_vec`]: trait.WithErrorDetails.html#tymethod.get_error_details_vec
+[`.get_details_bad_request`]: trait.WithErrorDetails.html#tymethod.get_details_bad_request
 */
 
 use prost::{DecodeError, EncodeError, Message};
