@@ -21,7 +21,7 @@ and handle them with ease.
 ## Getting Started
 ```
 [dependencies]
-tonic = "0.7"
+tonic = "0.8"
 tonic-richer-error = "0.2"
 ```
 
@@ -110,20 +110,23 @@ fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
 
 ### Send different standard error messages
 Multiple examples are provided at the [`ErrorDetails`] doc. Instructions about
-how to setup the messages fields correctly are provided at
-[standard error messages].
+how to use the fields of the standard error message types correctly are
+provided at [error_details.proto].
 
 ### Alternative `tonic::Status` associated functions and methods
 In the [`WithErrorDetails`] doc, an alternative way of interacting with
-`tonic::Status` is presented, using vectors of standard error messages
-directly. This approach can provide more control over the final error details
-vector if necessary. To see how to adopt this approach, please check the
+`tonic::Status` is presented, using vectors of error details structs wrapped
+with the [`ErrorDetail`] enum. This approach can provide more control over the
+vector of standard error messages that will be generated or that was received,
+if necessary. To see how to adopt this approach, please check the
 [`::with_error_details_vec`] and [`.get_error_details_vec`] docs, and also the
-[examples] directory.\
-Besides that, multiple examples with alternative error detail extration methods
-are provided in the [`WithErrorDetails`] doc, which can be specially useful if
-only one kind of error detail is being used. For example:
-[`.get_details_bad_request`].
+[examples] directory.  
+
+Besides that, multiple examples with alternative error details extration
+methods are provided in the [`WithErrorDetails`] doc, which can be specially
+useful if only one type of standard error message is being handled by the
+client. For example, using [`.get_details_bad_request`] is a more direct way of
+extracting a [`BadRequest`] error message from `tonic::Status`.
 
 ## License
 
@@ -141,9 +144,11 @@ conditions.
 [Website]: https://github.com/flemosr/tonic-richer-error
 [Docs]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/
 [examples]: https://github.com/flemosr/tonic-richer-error/tree/main/examples
-[standard error messages]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
+[error_details.proto]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
 [`ErrorDetails`]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/struct.ErrorDetails.html
 [`WithErrorDetails`]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/trait.WithErrorDetails.html
+[`ErrorDetail`]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/enum.ErrorDetail.html
 [`::with_error_details_vec`]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/trait.WithErrorDetails.html#tymethod.with_error_details_vec
 [`.get_error_details_vec`]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/trait.WithErrorDetails.html#tymethod.get_error_details_vec
 [`.get_details_bad_request`]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/trait.WithErrorDetails.html#tymethod.get_details_bad_request
+[`BadRequest`]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/struct.BadRequest.html
