@@ -15,7 +15,19 @@ pub struct RetryInfo {
 impl RetryInfo {
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.RetryInfo";
 
+    // Should not exceed `prost_types::Duration` range
+    const MAX_RETRY_DELAY: time::Duration = time::Duration::new(315_576_000_000, 999_999_999);
+
     pub fn new(retry_delay: Option<time::Duration>) -> Self {
+        let retry_delay = match retry_delay {
+            Some(mut delay) => {
+                if delay > RetryInfo::MAX_RETRY_DELAY {
+                    delay = RetryInfo::MAX_RETRY_DELAY
+                }
+                Some(delay)
+            }
+            None => None,
+        };
         RetryInfo {
             retry_delay: retry_delay,
         }
@@ -31,7 +43,18 @@ impl RetryInfo {
 impl IntoAny for RetryInfo {
     fn into_any(self) -> Result<Any, EncodeError> {
         let retry_delay = match self.retry_delay {
-            Some(duration) => Some(prost_types::Duration::from(duration)),
+            Some(duration) => {
+                // If duration is too large, uses max duration
+                // TODO: return the DurationError instead?
+                let duration = match prost_types::Duration::try_from(duration) {
+                    Ok(duration) => duration,
+                    Err(_) => prost_types::Duration {
+                        seconds: 315_576_000_000,
+                        nanos: 999_999_999,
+                    },
+                };
+                Some(duration)
+            }
             None => None,
         };
 
@@ -89,13 +112,13 @@ mod tests {
 
     #[test]
     fn gen_retry_info() {
-        let ri_details = RetryInfo::new(Some(Duration::from_secs(5)));
+        let ri_details = RetryInfo::new(Some(Duration::from_secs(u64::MAX)));
 
         let formatted = format!("{:?}", ri_details);
 
         println!("filled RetryInfo -> {formatted}");
 
-        let expected_filled = "RetryInfo { retry_delay: Some(5s) }";
+        let expected_filled = "RetryInfo { retry_delay: Some(315576000000.999999999s) }";
 
         assert!(
             formatted.eq(expected_filled),
@@ -116,7 +139,7 @@ mod tests {
         println!("Any generated from RetryInfo -> {formatted}");
 
         let expected =
-            "Any { type_url: \"type.googleapis.com/google.rpc.RetryInfo\", value: [10, 2, 8, 5] }";
+            "Any { type_url: \"type.googleapis.com/google.rpc.RetryInfo\", value: [10, 13, 8, 128, 188, 174, 206, 151, 9, 16, 255, 147, 235, 220, 3] }";
 
         assert!(
             formatted.eq(expected),
