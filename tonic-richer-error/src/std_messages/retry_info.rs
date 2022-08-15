@@ -6,18 +6,25 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
-/// Used to encode/decode the `RetryInfo` standard error message.
+/// Used to encode/decode the `RetryInfo` standard error message described in
+/// [error_details.proto]. Describes when the clients can retry a failed
+/// request.
+///
+/// [error_details.proto]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
 #[derive(Clone, Debug)]
 pub struct RetryInfo {
+    /// Informs the amout of time that clients should wait before retrying.
     pub retry_delay: Option<time::Duration>,
 }
 
 impl RetryInfo {
+    /// Type URL of the `RetryInfo` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.RetryInfo";
 
-    // Should not exceed `prost_types::Duration` range
+    /// Should not exceed `prost_types::Duration` range.
     const MAX_RETRY_DELAY: time::Duration = time::Duration::new(315_576_000_000, 999_999_999);
 
+    /// Creates a new `RetryInfo` struct.
     pub fn new(retry_delay: Option<time::Duration>) -> Self {
         let retry_delay = match retry_delay {
             Some(mut delay) => {
@@ -35,6 +42,8 @@ impl RetryInfo {
 }
 
 impl RetryInfo {
+    /// Returns `true` if `RetryInfo` delay is set as `None`, and `false` if
+    /// it is not.
     pub fn is_empty(&self) -> bool {
         self.retry_delay.is_none()
     }

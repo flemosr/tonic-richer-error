@@ -1,18 +1,37 @@
 use super::std_messages::*;
 
-/// Wraps the structs corresponding to the standard set of error message types,
-/// to allow the implementation and handling of vectors containing any of them.
+/// Wraps the structs corresponding to the standard error messages, allowing
+/// the implementation and handling of vectors containing any of them.
 #[derive(Clone, Debug)]
 pub enum ErrorDetail {
+    /// Wraps data corresponding to the `RetryInfo` standard error message.
     RetryInfo(RetryInfo),
+
+    /// Wraps data corresponding to the `DebugInfo` standard error message.
     DebugInfo(DebugInfo),
+
+    /// Wraps data corresponding to the `QuotaFailure` standard error message.
     QuotaFailure(QuotaFailure),
+
+    /// Wraps data corresponding to the `ErrorInfo` standard error message.
     ErrorInfo(ErrorInfo),
+
+    /// Wraps data corresponding to the `PreconditionFailure` standard error message.
     PreconditionFailure(PreconditionFailure),
+
+    /// Wraps data corresponding to the `BadRequest` standard error message.
     BadRequest(BadRequest),
+
+    /// Wraps data corresponding to the `RequestInfo` standard error message.
     RequestInfo(RequestInfo),
+
+    /// Wraps data corresponding to the `ResourceInfo` standard error message.
     ResourceInfo(ResourceInfo),
+
+    /// Wraps data corresponding to the `Help` standard error message.
     Help(Help),
+
+    /// Wraps data corresponding to the `LocalizedMessage` standard error message.
     LocalizedMessage(LocalizedMessage),
 }
 

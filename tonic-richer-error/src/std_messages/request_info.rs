@@ -4,16 +4,27 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
-/// Used to encode/decode the `RequestInfo` standard error message.
+/// Used to encode/decode the `RequestInfo` standard error message described
+/// in [error_details.proto]. Contains metadata about the request that
+/// clients can attach when providing feedback.
+///
+/// [error_details.proto]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
 #[derive(Clone, Debug)]
 pub struct RequestInfo {
+    /// An opaque string that should only be interpreted by the service that
+    /// generated it. For example, an id used to identify requests in the logs.
     pub request_id: String,
+
+    /// Any data used to serve this request. For example, an encrypted stack
+    /// trace that can be sent back to the service provider for debugging.
     pub serving_data: String,
 }
 
 impl RequestInfo {
+    /// Type URL of the `RequestInfo` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.RequestInfo";
 
+    /// Creates a new `RequestInfo` struct.
     pub fn new(request_id: impl Into<String>, serving_data: impl Into<String>) -> Self {
         RequestInfo {
             request_id: request_id.into(),
@@ -23,6 +34,8 @@ impl RequestInfo {
 }
 
 impl RequestInfo {
+    /// Returns `true` if `RequestInfo` fields are empty, and `false` if they
+    /// are not.
     pub fn is_empty(&self) -> bool {
         self.request_id.is_empty() && self.serving_data.is_empty()
     }

@@ -2,19 +2,42 @@ use std::{collections::HashMap, time};
 
 use super::std_messages::*;
 
-/// Stores all error details that will be send to the client. Provides associated
-/// functions and methods to setup and edit each detail independently.
+/// Groups the standard error messages structs. Provides associated
+/// functions and methods to setup and edit each error message independently.
+/// Used to extract error details from `tonic::Status`, and to generate a
+/// `tonic::Status` with error details.
 #[derive(Clone, Debug)]
 pub struct ErrorDetails {
+    /// Stores data corresponding to the `RetryInfo` standard error message.
     pub retry_info: Option<RetryInfo>,
+
+    /// Stores data corresponding to the `DebugInfo` standard error message.
     pub debug_info: Option<DebugInfo>,
+
+    /// Stores data corresponding to the `QuotaFailure` standard error message.
     pub quota_failure: Option<QuotaFailure>,
+
+    /// Stores data corresponding to the `ErrorInfo` standard error message.
     pub error_info: Option<ErrorInfo>,
+
+    /// Stores data corresponding to the `PreconditionFailure` standard error
+    /// message.
     pub precondition_failure: Option<PreconditionFailure>,
+
+    /// Stores data corresponding to the `BadRequest` standard error message.
     pub bad_request: Option<BadRequest>,
+
+    /// Stores data corresponding to the `RequestInfo` standard error message.
     pub request_info: Option<RequestInfo>,
+
+    /// Stores data corresponding to the `ResourceInfo` standard error message.
     pub resource_info: Option<ResourceInfo>,
+
+    /// Stores data corresponding to the `Help` standard error message.
     pub help: Option<Help>,
+
+    /// Stores data corresponding to the `LocalizedMessage` standard error
+    /// message.
     pub localized_message: Option<LocalizedMessage>,
 }
 

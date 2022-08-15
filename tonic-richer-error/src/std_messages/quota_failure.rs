@@ -4,14 +4,21 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
-/// Used to setup the `violations` field of the `QuotaFailure` struct.
+/// Used at the `violations` field of the [`QuotaFailure`] struct. Describes a
+/// single quota violation.
+///
+/// [`QuotaFailure`]: struct.QuotaFailure.html
 #[derive(Clone, Debug)]
 pub struct QuotaViolation {
+    /// Subject on which the quota check failed.
     pub subject: String,
+
+    /// Description of why the quota check failed.
     pub description: String,
 }
 
 impl QuotaViolation {
+    /// Creates a new `QuotaViolation` struct.
     pub fn new(subject: impl Into<String>, description: impl Into<String>) -> Self {
         QuotaViolation {
             subject: subject.into(),
@@ -20,21 +27,28 @@ impl QuotaViolation {
     }
 }
 
-/// Used to encode/decode the `QuotaFailure` standard error message.
+/// Used to encode/decode the `QuotaFailure` standard error message described
+/// in [error_details.proto]. Describes how a quota check failed.
+///
+/// [error_details.proto]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
 #[derive(Clone, Debug)]
 pub struct QuotaFailure {
+    /// Describes all quota violations.
     pub violations: Vec<QuotaViolation>,
 }
 
 impl QuotaFailure {
+    /// Type URL of the `QuotaFailure` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.QuotaFailure";
 
+    /// Creates a new `QuotaFailure` struct.
     pub fn new(violations: Vec<QuotaViolation>) -> Self {
         QuotaFailure {
             violations: violations,
         }
     }
 
+    /// Creates a new `QuotaFailure` struct with a single `QuotaViolation`.
     pub fn with_violation(subject: impl Into<String>, description: impl Into<String>) -> Self {
         QuotaFailure {
             violations: vec![QuotaViolation {
@@ -46,6 +60,7 @@ impl QuotaFailure {
 }
 
 impl QuotaFailure {
+    /// Adds a `QuotaViolation` to `QuotaFailure`.
     pub fn add_violation(
         &mut self,
         subject: impl Into<String>,
@@ -58,6 +73,8 @@ impl QuotaFailure {
         self
     }
 
+    /// Returns `true` if `QuotaFailure` does not contain any `QuotaViolation`,
+    /// and `false` if it does.
     pub fn is_empty(&self) -> bool {
         self.violations.is_empty()
     }

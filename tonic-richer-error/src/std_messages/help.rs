@@ -4,14 +4,20 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
-/// Used to setup the `links` field of the `Help` struct.
+/// Used at the `links` field of the [`Help`] struct. Describes a URL link.
+///
+/// [`Help`]: struct.Help.html
 #[derive(Clone, Debug)]
 pub struct HelpLink {
+    /// Description of what the link offers.
     pub description: String,
+
+    /// URL of the link.
     pub url: String,
 }
 
 impl HelpLink {
+    /// Creates a new `HelpLink` struct.
     pub fn new(description: impl Into<String>, url: impl Into<String>) -> Self {
         HelpLink {
             description: description.into(),
@@ -20,19 +26,27 @@ impl HelpLink {
     }
 }
 
-/// Used to encode/decode the `Help` standard error message.
+/// Used to encode/decode the `Help` standard error message described in
+/// [error_details.proto]. Provides links to documentation or for performing
+/// an out-of-band action.
+///
+/// [error_details.proto]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
 #[derive(Clone, Debug)]
 pub struct Help {
+    /// Links pointing to additional information on how to handle the error.
     pub links: Vec<HelpLink>,
 }
 
 impl Help {
+    /// Type URL of the `Help` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.Help";
 
+    /// Creates a new `Help` struct.
     pub fn new(links: Vec<HelpLink>) -> Self {
         Help { links }
     }
 
+    /// Creates a new `Help` struct with a single `HelpLink`.
     pub fn with_link(description: impl Into<String>, url: impl Into<String>) -> Self {
         Help {
             links: vec![HelpLink {
@@ -44,6 +58,7 @@ impl Help {
 }
 
 impl Help {
+    /// Adds a `HelpLink` to `Help`.
     pub fn add_link(
         &mut self,
         description: impl Into<String>,
@@ -56,6 +71,8 @@ impl Help {
         self
     }
 
+    /// Returns `true` if `Help` does not contain any `HelpLink`, and `false`
+    /// if it does.
     pub fn is_empty(&self) -> bool {
         self.links.is_empty()
     }

@@ -4,16 +4,24 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
-/// Used to encode/decode the `DebugInfo` standard error message.
+/// Used to encode/decode the `DebugInfo` standard error message described in
+/// [error_details.proto]. Describes additional debugging info.
+///
+/// [error_details.proto]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
 #[derive(Clone, Debug)]
 pub struct DebugInfo {
+    /// Stack trace entries indicating where the error occurred.
     pub stack_entries: Vec<String>,
+
+    /// Additional debugging information provided by the server.
     pub detail: String,
 }
 
 impl DebugInfo {
+    /// Type URL of the `DebugInfo` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.DebugInfo";
 
+    /// Creates a new `DebugInfo` struct.
     pub fn new(stack_entries: Vec<String>, detail: impl Into<String>) -> Self {
         DebugInfo {
             stack_entries: stack_entries,
@@ -23,6 +31,8 @@ impl DebugInfo {
 }
 
 impl DebugInfo {
+    /// Returns `true` if `DebugInfo` fields are empty, and `false` if they
+    /// are not.
     pub fn is_empty(&self) -> bool {
         self.stack_entries.is_empty() && self.detail.is_empty()
     }

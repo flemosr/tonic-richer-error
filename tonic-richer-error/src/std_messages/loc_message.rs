@@ -4,16 +4,28 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
-/// Used to encode/decode the `LocalizedMessage` standard error message.
+/// Used to encode/decode the `LocalizedMessage` standard error message
+/// described in [error_details.proto]. Provides a localized error message
+/// that is safe to return to the user.
+///
+/// [error_details.proto]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
 #[derive(Clone, Debug)]
 pub struct LocalizedMessage {
+    /// Locale used, following the specification defined in [BCP 47]. For
+    /// example: "en-US", "fr-CH" or "es-MX".
+    ///
+    /// [BCP 47]: http://www.rfc-editor.org/rfc/bcp/bcp47.txt
     pub locale: String,
+
+    /// Message corresponding to the locale.
     pub message: String,
 }
 
 impl LocalizedMessage {
+    /// Type URL of the `LocalizedMessage` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.LocalizedMessage";
 
+    /// Creates a new `LocalizedMessage` struct.
     pub fn new(locale: impl Into<String>, message: impl Into<String>) -> Self {
         LocalizedMessage {
             locale: locale.into(),
@@ -23,6 +35,8 @@ impl LocalizedMessage {
 }
 
 impl LocalizedMessage {
+    /// Returns `true` if `LocalizedMessage` fields are empty, and `false` if
+    /// they are not.
     pub fn is_empty(&self) -> bool {
         self.locale.is_empty() && self.message.is_empty()
     }

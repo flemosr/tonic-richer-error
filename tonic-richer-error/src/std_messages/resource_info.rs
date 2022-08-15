@@ -4,18 +4,30 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
-/// Used to encode/decode the `ResourceInfo` standard error message.
+/// Used to encode/decode the `ResourceInfo` standard error message described
+/// in [error_details.proto]. Describes the resource that is being accessed.
+///
+/// [error_details.proto]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
 #[derive(Clone, Debug)]
 pub struct ResourceInfo {
+    /// Type of resource being accessed.
     pub resource_type: String,
+
+    /// Name of the resource being accessed.
     pub resource_name: String,
+
+    /// The owner of the resource (optional).
     pub owner: String,
+
+    /// Describes the error encountered when accessing the resource.
     pub description: String,
 }
 
 impl ResourceInfo {
+    /// Type URL of the `ResourceInfo` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.ResourceInfo";
 
+    /// Creates a new `ResourceInfo` struct.
     pub fn new(
         resource_type: impl Into<String>,
         resource_name: impl Into<String>,
@@ -32,6 +44,8 @@ impl ResourceInfo {
 }
 
 impl ResourceInfo {
+    /// Returns `true` if `ResourceInfo` fields are empty, and `false` if they
+    /// are not.
     pub fn is_empty(&self) -> bool {
         self.resource_type.is_empty()
             && self.resource_name.is_empty()

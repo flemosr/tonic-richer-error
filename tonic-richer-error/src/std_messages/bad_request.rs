@@ -4,14 +4,23 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
-/// Used to setup the `field_violations` field of the `BadRequest` struct.
+/// Used at the `field_violations` field of the [`BadRequest`] struct. Describes
+/// a single bad request field.
+///
+/// [`BadRequest`]: struct.BadRequest.html
 #[derive(Clone, Debug)]
 pub struct FieldViolation {
+    /// Path leading to a field in the request body. Value should be a
+    /// sequence of dot-separated identifiers that identify a protocol buffer
+    /// field.
     pub field: String,
+
+    /// Description of why the field is bad.
     pub description: String,
 }
 
 impl FieldViolation {
+    /// Creates a new `FieldViolation` struct.
     pub fn new(field: impl Into<String>, description: impl Into<String>) -> Self {
         FieldViolation {
             field: field.into(),
@@ -20,19 +29,27 @@ impl FieldViolation {
     }
 }
 
-/// Used to encode/decode the `BadRequest` standard error message.
+/// Used to encode/decode the `BadRequest` standard error message described in
+/// [error_details.proto]. Describes violations in a client request. Focuses
+/// on the syntactic aspects of the request.
+///
+/// [error_details.proto]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
 #[derive(Clone, Debug)]
 pub struct BadRequest {
+    /// Describes all field violations of the request.
     pub field_violations: Vec<FieldViolation>,
 }
 
 impl BadRequest {
+    /// Type URL of the `BadRequest` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.BadRequest";
 
+    /// Creates a new `BadRequest` struct.
     pub fn new(field_violations: Vec<FieldViolation>) -> Self {
         BadRequest { field_violations }
     }
 
+    /// Creates a new `BadRequest` struct with a single `FieldViolation`.
     pub fn with_violation(field: impl Into<String>, description: impl Into<String>) -> Self {
         BadRequest {
             field_violations: vec![FieldViolation {
@@ -44,6 +61,7 @@ impl BadRequest {
 }
 
 impl BadRequest {
+    /// Adds a `FieldViolation` to `BadRequest`.
     pub fn add_violation(
         &mut self,
         field: impl Into<String>,
@@ -56,6 +74,8 @@ impl BadRequest {
         self
     }
 
+    /// Returns `true` if `BadRequest` does not contain any `FieldViolation`,
+    /// and `false` if it does.
     pub fn is_empty(&self) -> bool {
         self.field_violations.is_empty()
     }
