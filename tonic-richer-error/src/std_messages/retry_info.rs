@@ -1,4 +1,5 @@
-use std::{ops::Add, time};
+use std::convert::TryFrom;
+use std::time;
 
 use prost::{DecodeError, EncodeError, Message};
 use prost_types::Any;
@@ -53,8 +54,7 @@ impl IntoAny for RetryInfo {
     fn into_any(self) -> Result<Any, EncodeError> {
         let retry_delay = match self.retry_delay {
             Some(duration) => {
-                // If duration is too large, uses max duration
-                // TODO: return the DurationError instead?
+                // If duration is too large, uses max `prost_types::Duration`
                 let duration = match prost_types::Duration::try_from(duration) {
                     Ok(duration) => duration,
                     Err(_) => prost_types::Duration {
@@ -83,22 +83,15 @@ impl IntoAny for RetryInfo {
 }
 
 impl FromAny for RetryInfo {
-    // Negative retry_delays become 0
     fn from_any(any: Any) -> Result<Self, DecodeError> {
         let buf: &[u8] = &any.value;
         let retry_info = pb::RetryInfo::decode(buf)?;
 
         let retry_delay = match retry_info.retry_delay {
             Some(duration) => {
-                let secs: u64 = duration.seconds.try_into().unwrap_or(0);
-
-                let mut conv_duration = time::Duration::from_secs(secs);
-
-                let nanos: u64 = duration.nanos.try_into().unwrap_or(0);
-
-                conv_duration = conv_duration.add(time::Duration::from_nanos(nanos));
-
-                Some(conv_duration)
+                // Negative retry_delays become 0
+                let duration = time::Duration::try_from(duration).unwrap_or(time::Duration::ZERO);
+                Some(duration)
             }
             None => None,
         };
