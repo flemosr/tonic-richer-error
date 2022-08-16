@@ -146,7 +146,8 @@ use prost::{DecodeError, EncodeError, Message};
 use prost_types::Any;
 use tonic::{codegen::Bytes, Code, Status};
 
-mod pb {
+/// Compiled google.rpc protos
+pub mod pb {
     include!(concat!(env!("OUT_DIR"), "/google.rpc.rs"));
 }
 
