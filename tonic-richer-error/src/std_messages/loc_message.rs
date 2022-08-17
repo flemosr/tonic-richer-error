@@ -1,4 +1,4 @@
-use prost::{DecodeError, EncodeError, Message};
+use prost::{DecodeError, Message};
 use prost_types::Any;
 
 use super::super::pb;
@@ -43,20 +43,16 @@ impl LocalizedMessage {
 }
 
 impl IntoAny for LocalizedMessage {
-    fn into_any(self) -> Result<Any, EncodeError> {
+    fn into_any(self) -> Any {
         let detail_data = pb::LocalizedMessage {
             locale: self.locale,
             message: self.message,
         };
 
-        let mut buf: Vec<u8> = Vec::new();
-        buf.reserve(detail_data.encoded_len());
-        detail_data.encode(&mut buf)?;
-
-        Ok(Any {
+        Any {
             type_url: LocalizedMessage::TYPE_URL.to_string(),
-            value: buf,
-        })
+            value: detail_data.encode_to_vec(),
+        }
     }
 }
 
@@ -96,10 +92,8 @@ mod tests {
             "filled LocalizedMessage differs from expected result"
         );
 
-        let gen_any = match error_info.into_any() {
-            Err(error) => panic!("Error generating Any from LocalizedMessage: {:?}", error),
-            Ok(gen_any) => gen_any,
-        };
+        let gen_any = error_info.into_any();
+
         let formatted = format!("{:?}", gen_any);
 
         println!("Any generated from LocalizedMessage -> {formatted}");

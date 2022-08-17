@@ -1,4 +1,4 @@
-use prost::{DecodeError, EncodeError, Message};
+use prost::{DecodeError, Message};
 use prost_types::Any;
 
 use super::super::pb;
@@ -77,7 +77,7 @@ impl Help {
 }
 
 impl IntoAny for Help {
-    fn into_any(self) -> Result<Any, EncodeError> {
+    fn into_any(self) -> Any {
         let detail_data = pb::Help {
             links: self
                 .links
@@ -89,14 +89,10 @@ impl IntoAny for Help {
                 .collect(),
         };
 
-        let mut buf: Vec<u8> = Vec::new();
-        buf.reserve(detail_data.encoded_len());
-        detail_data.encode(&mut buf)?;
-
-        Ok(Any {
+        Any {
             type_url: Help::TYPE_URL.to_string(),
-            value: buf,
-        })
+            value: detail_data.encode_to_vec(),
+        }
     }
 }
 
@@ -164,10 +160,8 @@ mod tests {
             "filled Help returns 'true' from .is_empty()"
         );
 
-        let gen_any = match help.into_any() {
-            Err(error) => panic!("Error generating Any from Help: {:?}", error),
-            Ok(gen_any) => gen_any,
-        };
+        let gen_any = help.into_any();
+
         let formatted = format!("{:?}", gen_any);
 
         println!("Any generated from Help -> {formatted}");

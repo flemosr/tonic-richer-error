@@ -61,8 +61,7 @@ if err_details.has_bad_request_violations() {
         Code::InvalidArgument,
         "bad request",
         err_details,
-    )
-    .unwrap();
+    );
 
     // Here the status would be returned. Omitted to avoid breaking tests
     // return Err(status);
@@ -138,7 +137,7 @@ more direct way of extracting a [`BadRequest`] error message from
     unreachable_pub
 )]
 
-use prost::{DecodeError, EncodeError, Message};
+use prost::{DecodeError, Message};
 use prost_types::Any;
 use tonic::{codegen::Bytes, Code, Status};
 
@@ -158,7 +157,7 @@ pub use error_details::ErrorDetails;
 pub use error_details_vec::ErrorDetail;
 
 trait IntoAny {
-    fn into_any(self) -> Result<Any, EncodeError>;
+    fn into_any(self) -> Any;
 }
 
 trait FromAny {
@@ -182,14 +181,13 @@ pub trait WithErrorDetails {
     ///     Code::InvalidArgument,
     ///     "bad request",
     ///     ErrorDetails::with_bad_request_violation("field", "description"),
-    /// )
-    /// .unwrap();
+    /// );
     /// ```
     fn with_error_details(
         code: tonic::Code,
         message: impl Into<String>,
         details: ErrorDetails,
-    ) -> Result<Status, EncodeError>;
+    ) -> Status;
 
     /// Generates a `tonic::Status` with error details provided in a vector of
     /// [`ErrorDetail`] enums.
@@ -205,14 +203,13 @@ pub trait WithErrorDetails {
     ///     vec![
     ///         BadRequest::with_violation("field", "description").into(),
     ///     ]
-    /// )
-    /// .unwrap();
+    /// );
     /// ```
     fn with_error_details_vec(
         code: tonic::Code,
         message: impl Into<String>,
         details: Vec<ErrorDetail>,
-    ) -> Result<Status, EncodeError>;
+    ) -> Status;
 
     /// Get an [`ErrorDetails`] struct from a `tonic::Status`.
     /// # Examples
@@ -465,53 +462,49 @@ pub trait WithErrorDetails {
 }
 
 impl WithErrorDetails for Status {
-    fn with_error_details(
-        code: Code,
-        message: impl Into<String>,
-        details: ErrorDetails,
-    ) -> Result<Self, EncodeError> {
+    fn with_error_details(code: Code, message: impl Into<String>, details: ErrorDetails) -> Self {
         let message: String = message.into();
 
         let mut conv_details: Vec<Any> = Vec::with_capacity(10);
 
         if let Some(retry_info) = details.retry_info {
-            conv_details.push(retry_info.into_any()?);
+            conv_details.push(retry_info.into_any());
         }
 
         if let Some(debug_info) = details.debug_info {
-            conv_details.push(debug_info.into_any()?);
+            conv_details.push(debug_info.into_any());
         }
 
         if let Some(quota_failure) = details.quota_failure {
-            conv_details.push(quota_failure.into_any()?);
+            conv_details.push(quota_failure.into_any());
         }
 
         if let Some(error_info) = details.error_info {
-            conv_details.push(error_info.into_any()?);
+            conv_details.push(error_info.into_any());
         }
 
         if let Some(precondition_failure) = details.precondition_failure {
-            conv_details.push(precondition_failure.into_any()?);
+            conv_details.push(precondition_failure.into_any());
         }
 
         if let Some(bad_request) = details.bad_request {
-            conv_details.push(bad_request.into_any()?);
+            conv_details.push(bad_request.into_any());
         }
 
         if let Some(request_info) = details.request_info {
-            conv_details.push(request_info.into_any()?);
+            conv_details.push(request_info.into_any());
         }
 
         if let Some(resource_info) = details.resource_info {
-            conv_details.push(resource_info.into_any()?);
+            conv_details.push(resource_info.into_any());
         }
 
         if let Some(help) = details.help {
-            conv_details.push(help.into_any()?);
+            conv_details.push(help.into_any());
         }
 
         if let Some(localized_message) = details.localized_message {
-            conv_details.push(localized_message.into_any()?);
+            conv_details.push(localized_message.into_any());
         }
 
         let status = pb::Status {
@@ -520,20 +513,14 @@ impl WithErrorDetails for Status {
             details: conv_details,
         };
 
-        let mut buf: Vec<u8> = Vec::new();
-        buf.reserve(status.encoded_len());
-        status.encode(&mut buf)?;
-
-        let status = Status::with_details(code, message, Bytes::from(buf));
-
-        Ok(status)
+        Status::with_details(code, message, Bytes::from(status.encode_to_vec()))
     }
 
     fn with_error_details_vec(
         code: Code,
         message: impl Into<String>,
         details: Vec<ErrorDetail>,
-    ) -> Result<Self, EncodeError> {
+    ) -> Self {
         let message: String = message.into();
 
         let mut conv_details: Vec<Any> = Vec::with_capacity(details.len());
@@ -541,34 +528,34 @@ impl WithErrorDetails for Status {
         for error_detail in details.into_iter() {
             match error_detail {
                 ErrorDetail::RetryInfo(retry_info) => {
-                    conv_details.push(retry_info.into_any()?);
+                    conv_details.push(retry_info.into_any());
                 }
                 ErrorDetail::DebugInfo(debug_info) => {
-                    conv_details.push(debug_info.into_any()?);
+                    conv_details.push(debug_info.into_any());
                 }
                 ErrorDetail::QuotaFailure(quota_failure) => {
-                    conv_details.push(quota_failure.into_any()?);
+                    conv_details.push(quota_failure.into_any());
                 }
                 ErrorDetail::ErrorInfo(error_info) => {
-                    conv_details.push(error_info.into_any()?);
+                    conv_details.push(error_info.into_any());
                 }
                 ErrorDetail::PreconditionFailure(prec_failure) => {
-                    conv_details.push(prec_failure.into_any()?);
+                    conv_details.push(prec_failure.into_any());
                 }
                 ErrorDetail::BadRequest(bad_req) => {
-                    conv_details.push(bad_req.into_any()?);
+                    conv_details.push(bad_req.into_any());
                 }
                 ErrorDetail::RequestInfo(req_info) => {
-                    conv_details.push(req_info.into_any()?);
+                    conv_details.push(req_info.into_any());
                 }
                 ErrorDetail::ResourceInfo(res_info) => {
-                    conv_details.push(res_info.into_any()?);
+                    conv_details.push(res_info.into_any());
                 }
                 ErrorDetail::Help(help) => {
-                    conv_details.push(help.into_any()?);
+                    conv_details.push(help.into_any());
                 }
                 ErrorDetail::LocalizedMessage(loc_message) => {
-                    conv_details.push(loc_message.into_any()?);
+                    conv_details.push(loc_message.into_any());
                 }
             }
         }
@@ -579,13 +566,7 @@ impl WithErrorDetails for Status {
             details: conv_details,
         };
 
-        let mut buf: Vec<u8> = Vec::new();
-        buf.reserve(status.encoded_len());
-        status.encode(&mut buf)?;
-
-        let status = Status::with_details(code, message, Bytes::from(buf));
-
-        Ok(status)
+        Status::with_details(code, message, Bytes::from(status.encode_to_vec()))
     }
 
     fn get_error_details(&self) -> Result<ErrorDetails, DecodeError> {
@@ -903,27 +884,21 @@ mod tests {
 
         println!("{fmt_details_vec}\n");
 
-        let status_from_struct = match Status::with_error_details(
+        let status_from_struct = Status::with_error_details(
             Code::InvalidArgument,
             "error with bad request details",
             err_details,
-        ) {
-            Ok(status) => status,
-            Err(err) => panic!("Error generating status: {:?}", err),
-        };
+        );
 
         let fmt_status_with_details = format!("{:?}", status_from_struct);
 
         println!("{:?}\n", fmt_status_with_details);
 
-        let status_from_vec = match Status::with_error_details_vec(
+        let status_from_vec = Status::with_error_details_vec(
             Code::InvalidArgument,
             "error with bad request details",
             err_details_vec,
-        ) {
-            Ok(status) => status,
-            Err(err) => panic!("Error generating status: {:?}", err),
-        };
+        );
 
         let fmt_status_with_details_vec = format!("{:?}", status_from_vec);
 

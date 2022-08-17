@@ -1,4 +1,4 @@
-use prost::{DecodeError, EncodeError, Message};
+use prost::{DecodeError, Message};
 use prost_types::Any;
 
 use super::super::pb;
@@ -101,7 +101,7 @@ impl PreconditionFailure {
 }
 
 impl IntoAny for PreconditionFailure {
-    fn into_any(self) -> Result<Any, EncodeError> {
+    fn into_any(self) -> Any {
         let detail_data = pb::PreconditionFailure {
             violations: self
                 .violations
@@ -114,14 +114,10 @@ impl IntoAny for PreconditionFailure {
                 .collect(),
         };
 
-        let mut buf: Vec<u8> = Vec::new();
-        buf.reserve(detail_data.encoded_len());
-        detail_data.encode(&mut buf)?;
-
-        Ok(Any {
+        Any {
             type_url: PreconditionFailure::TYPE_URL.to_string(),
-            value: buf,
-        })
+            value: detail_data.encode_to_vec(),
+        }
     }
 }
 
@@ -191,10 +187,8 @@ mod tests {
             "filled PreconditionFailure returns 'true' from .is_empty()"
         );
 
-        let gen_any = match prec_failure.into_any() {
-            Err(error) => panic!("Error generating Any from PreconditionFailure: {:?}", error),
-            Ok(gen_any) => gen_any,
-        };
+        let gen_any = prec_failure.into_any();
+
         let formatted = format!("{:?}", gen_any);
 
         println!("Any generated from PreconditionFailure -> {formatted}");

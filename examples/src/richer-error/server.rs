@@ -43,8 +43,7 @@ impl Greeter for MyGreeter {
                 Code::InvalidArgument,
                 "request contains invalid arguments",
                 err_details,
-            )
-            .unwrap();
+            );
 
             return Err(status);
         }

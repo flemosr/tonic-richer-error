@@ -1,4 +1,4 @@
-use prost::{DecodeError, EncodeError, Message};
+use prost::{DecodeError, Message};
 use prost_types::Any;
 
 use super::super::pb;
@@ -81,7 +81,7 @@ impl BadRequest {
 }
 
 impl IntoAny for BadRequest {
-    fn into_any(self) -> Result<Any, EncodeError> {
+    fn into_any(self) -> Any {
         let detail_data = pb::BadRequest {
             field_violations: self
                 .field_violations
@@ -93,14 +93,10 @@ impl IntoAny for BadRequest {
                 .collect(),
         };
 
-        let mut buf: Vec<u8> = Vec::new();
-        buf.reserve(detail_data.encoded_len());
-        detail_data.encode(&mut buf)?;
-
-        Ok(Any {
+        Any {
             type_url: BadRequest::TYPE_URL.to_string(),
-            value: buf,
-        })
+            value: detail_data.encode_to_vec(),
+        }
     }
 }
 
@@ -169,10 +165,7 @@ mod tests {
             "filled BadRequest returns 'true' from .is_empty()"
         );
 
-        let gen_any = match br_details.into_any() {
-            Err(error) => panic!("Error generating Any from BadRequest: {:?}", error),
-            Ok(gen_any) => gen_any,
-        };
+        let gen_any = br_details.into_any();
         let formatted = format!("{:?}", gen_any);
 
         println!("Any generated from BadRequest -> {formatted}");
