@@ -4,45 +4,43 @@ use super::std_messages::*;
 
 /// Groups the standard error messages structs. Provides associated
 /// functions and methods to setup and edit each error message independently.
-/// Used to extract error details from `tonic::Status`, and to generate a
-/// `tonic::Status` with error details.
+/// Used when extracting error details from `tonic::Status`, and when
+/// creating a `tonic::Status` with error details.
 #[derive(Clone, Debug)]
 pub struct ErrorDetails {
-    /// Stores data corresponding to the `RetryInfo` standard error message.
+    /// This field stores [`RetryInfo`] data, if any.
     pub retry_info: Option<RetryInfo>,
 
-    /// Stores data corresponding to the `DebugInfo` standard error message.
+    /// This field stores [`DebugInfo`] data, if any.
     pub debug_info: Option<DebugInfo>,
 
-    /// Stores data corresponding to the `QuotaFailure` standard error message.
+    /// This field stores [`QuotaFailure`] data, if any.
     pub quota_failure: Option<QuotaFailure>,
 
-    /// Stores data corresponding to the `ErrorInfo` standard error message.
+    /// This field stores [`ErrorInfo`] data, if any.
     pub error_info: Option<ErrorInfo>,
 
-    /// Stores data corresponding to the `PreconditionFailure` standard error
-    /// message.
+    /// This field stores [`PreconditionFailure`] data, if any.
     pub precondition_failure: Option<PreconditionFailure>,
 
-    /// Stores data corresponding to the `BadRequest` standard error message.
+    /// This field stores [`BadRequest`] data, if any.
     pub bad_request: Option<BadRequest>,
 
-    /// Stores data corresponding to the `RequestInfo` standard error message.
+    /// This field stores [`RequestInfo`] data, if any.
     pub request_info: Option<RequestInfo>,
 
-    /// Stores data corresponding to the `ResourceInfo` standard error message.
+    /// This field stores [`ResourceInfo`] data, if any.
     pub resource_info: Option<ResourceInfo>,
 
-    /// Stores data corresponding to the `Help` standard error message.
+    /// This field stores [`Help`] data, if any.
     pub help: Option<Help>,
 
-    /// Stores data corresponding to the `LocalizedMessage` standard error
-    /// message.
+    /// This field stores [`LocalizedMessage`] data, if any.
     pub localized_message: Option<LocalizedMessage>,
 }
 
 impl ErrorDetails {
-    /// Generates an `ErrorDetails` struct with all fields set to `None`.
+    /// Generates an [`ErrorDetails`] struct with all fields set to `None`.
     /// # Examples
     ///
     /// ```
@@ -65,7 +63,7 @@ impl ErrorDetails {
         }
     }
 
-    /// Generates an `ErrorDetails` struct with `RetryInfo` details and
+    /// Generates an [`ErrorDetails`] struct with [`RetryInfo`] details and
     /// remaining fields set to `None`.
     /// # Examples
     ///
@@ -82,7 +80,7 @@ impl ErrorDetails {
         }
     }
 
-    /// Generates an `ErrorDetails` struct with `DebugInfo` details and
+    /// Generates an [`ErrorDetails`] struct with [`DebugInfo`] details and
     /// remaining fields set to `None`.
     /// # Examples
     ///
@@ -100,7 +98,7 @@ impl ErrorDetails {
         }
     }
 
-    /// Generates an `ErrorDetails` struct with `QuotaFailure` details and
+    /// Generates an [`ErrorDetails`] struct with [`QuotaFailure`] details and
     /// remaining fields set to `None`.
     /// # Examples
     ///
@@ -119,8 +117,8 @@ impl ErrorDetails {
         }
     }
 
-    /// Generates an `ErrorDetails` struct with `QuotaFailure` details and
-    /// remaining fields set to `None`.
+    /// Generates an [`ErrorDetails`] struct with [`QuotaFailure`] details (one
+    /// [`QuotaViolation`] set) and remaining fields set to `None`.
     /// # Examples
     ///
     /// ```
@@ -138,7 +136,7 @@ impl ErrorDetails {
         }
     }
 
-    /// Generates an `ErrorDetails` struct with `ErrorInfo` details, and
+    /// Generates an [`ErrorDetails`] struct with [`ErrorInfo`] details and
     /// remaining fields set to `None`.
     /// # Examples
     ///
@@ -162,8 +160,8 @@ impl ErrorDetails {
         }
     }
 
-    /// Generates an `ErrorDetails` struct with `PreconditionFailure` details
-    /// and remaining fields set to `None`.
+    /// Generates an [`ErrorDetails`] struct with [`PreconditionFailure`]
+    /// details and remaining fields set to `None`.
     /// # Examples
     ///
     /// ```
@@ -189,8 +187,9 @@ impl ErrorDetails {
         }
     }
 
-    /// Generates an `ErrorDetails` struct with `PreconditionFailure` details
-    /// (one violation set), and remaining fields set to `None`.
+    /// Generates an [`ErrorDetails`] struct with [`PreconditionFailure`]
+    /// details (one [`PreconditionViolation`] set) and remaining fields set to
+    /// `None`.
     /// # Examples
     ///
     /// ```
@@ -217,7 +216,7 @@ impl ErrorDetails {
         }
     }
 
-    /// Generates an `ErrorDetails` struct with `BadRequest` details and
+    /// Generates an [`ErrorDetails`] struct with [`BadRequest`] details and
     /// remaining fields set to `None`.
     /// # Examples
     ///
@@ -236,8 +235,8 @@ impl ErrorDetails {
         }
     }
 
-    /// Generates an `ErrorDetails` struct with `BadRequest` details (one
-    /// field_violation set) and remaining fields set to `None`.
+    /// Generates an [`ErrorDetails`] struct with [`BadRequest`] details (one
+    /// [`FieldViolation`] set) and remaining fields set to `None`.
     /// # Examples
     ///
     /// ```
@@ -258,7 +257,7 @@ impl ErrorDetails {
         }
     }
 
-    /// Generates an `ErrorDetails` struct with `RequestInfo` details and
+    /// Generates an [`ErrorDetails`] struct with [`RequestInfo`] details and
     /// remaining fields set to `None`.
     /// # Examples
     ///
@@ -280,7 +279,7 @@ impl ErrorDetails {
         }
     }
 
-    /// Generates an `ErrorDetails` struct with `ResourceInfo` details and
+    /// Generates an [`ErrorDetails`] struct with [`ResourceInfo`] details and
     /// remaining fields set to `None`.
     /// # Examples
     ///
@@ -311,8 +310,8 @@ impl ErrorDetails {
         }
     }
 
-    /// Generates an `ErrorDetails` struct with `Help` details and remaining
-    /// fields set to `None`.
+    /// Generates an [`ErrorDetails`] struct with [`Help`] details and
+    /// remaining fields set to `None`.
     /// # Examples
     ///
     /// ```
@@ -330,8 +329,8 @@ impl ErrorDetails {
         }
     }
 
-    /// Generates an `ErrorDetails` struct with `Help` details (one link set),
-    /// and remaining fields set to `None`.
+    /// Generates an [`ErrorDetails`] struct with [`Help`] details (one
+    /// [`HelpLink`] set) and remaining fields set to `None`.
     /// # Examples
     ///
     /// ```
@@ -349,8 +348,8 @@ impl ErrorDetails {
         }
     }
 
-    /// Generates an `ErrorDetails` struct with `LocalizedMessage` details and
-    /// remaining fields set to `None`.
+    /// Generates an [`ErrorDetails`] struct with [`LocalizedMessage`] details
+    /// and remaining fields set to `None`.
     /// # Examples
     ///
     /// ```
@@ -370,8 +369,8 @@ impl ErrorDetails {
 }
 
 impl ErrorDetails {
-    /// Set `RetryInfo` details. Can be chained with other `.set_` and `.add_`
-    /// methods.
+    /// Set [`RetryInfo`] details. Can be chained with other `.set_` and
+    /// `.add_` [`ErrorDetails`] methods.
     /// # Examples
     ///
     /// ```
@@ -387,8 +386,8 @@ impl ErrorDetails {
         self
     }
 
-    /// Set `DebugInfo` details. Can be chained with other `.set_` and `.add_`
-    /// methods.
+    /// Set [`DebugInfo`] details. Can be chained with other `.set_` and
+    /// `.add_` [`ErrorDetails`] methods.
     /// # Examples
     ///
     /// ```
@@ -409,8 +408,8 @@ impl ErrorDetails {
         self
     }
 
-    /// Set `QuotaFailure` details. Can be chained with other `.set_` and
-    /// `.add_` methods.
+    /// Set [`QuotaFailure`] details. Can be chained with other `.set_` and
+    /// `.add_` [`ErrorDetails`] methods.
     /// # Examples
     ///
     /// ```
@@ -428,9 +427,9 @@ impl ErrorDetails {
         self
     }
 
-    /// Adds a `QuotaViolation` to `QuotaFailure` details. Sets `QuotaFailure`
-    /// if it is not set yet. Can be chained with other `.set_` and `.add_`
-    /// methods.
+    /// Adds a [`QuotaViolation`] to [`QuotaFailure`] details. Sets
+    /// [`QuotaFailure`] details if it is not set yet. Can be chained with
+    /// other `.set_` and `.add_` [`ErrorDetails`] methods.
     /// # Examples
     ///
     /// ```
@@ -456,8 +455,8 @@ impl ErrorDetails {
         self
     }
 
-    /// Returns `true` if `QuotaFailure` is set and its `violations` vector is
-    /// not empty, otherwise returns `false`.
+    /// Returns `true` if [`QuotaFailure`] is set and its `violations` vector
+    /// is not empty, otherwise returns `false`.
     /// # Examples
     ///
     /// ```
@@ -478,8 +477,8 @@ impl ErrorDetails {
         false
     }
 
-    /// Set `ErrorInfo` details. Can be chained with other `.set_` and `.add_`
-    /// methods.
+    /// Set [`ErrorInfo`] details. Can be chained with other `.set_` and
+    /// `.add_` [`ErrorDetails`] methods.
     /// # Examples
     ///
     /// ```
@@ -503,8 +502,8 @@ impl ErrorDetails {
         self
     }
 
-    /// Set `PreconditionFailure` details. Can be chained with other `.set_`
-    /// and `.add_` methods.
+    /// Set [`PreconditionFailure`] details. Can be chained with other `.set_`
+    /// and `.add_` [`ErrorDetails`] methods.
     /// # Examples
     ///
     /// ```
@@ -533,9 +532,9 @@ impl ErrorDetails {
         self
     }
 
-    /// Adds a `PreconditionViolation` to `PreconditionFailure` details. Sets
-    /// `PreconditionFailure` if it is not set yet. Can be chained with other
-    /// `.set_` and `.add_` methods.
+    /// Adds a [`PreconditionViolation`] to [`PreconditionFailure`] details.
+    /// Sets [`PreconditionFailure`] details if it is not set yet. Can be
+    /// chained with other `.set_` and `.add_` [`ErrorDetails`] methods.
     /// # Examples
     ///
     /// ```
@@ -570,7 +569,7 @@ impl ErrorDetails {
         self
     }
 
-    /// Returns `true` if `PreconditionFailure` is set and its `violations`
+    /// Returns `true` if [`PreconditionFailure`] is set and its `violations`
     /// vector is not empty, otherwise returns `false`.
     /// # Examples
     ///
@@ -596,8 +595,8 @@ impl ErrorDetails {
         false
     }
 
-    /// Set `BadRequest` details. Can be chained with other `.set_` and `.add_`
-    /// methods.
+    /// Set [`BadRequest`] details. Can be chained with other `.set_` and
+    /// `.add_` [`ErrorDetails`] methods.
     /// # Examples
     ///
     /// ```
@@ -615,8 +614,9 @@ impl ErrorDetails {
         self
     }
 
-    /// Adds a `FieldViolation` to `BadRequest` details. Sets `BadRequest` if it
-    /// is not set yet. Can be chained with other `.set_` and `.add_` methods.
+    /// Adds a [`FieldViolation`] to [`BadRequest`] details. Sets
+    /// [`BadRequest`] details if it is not set yet. Can be chained with other
+    /// `.set_` and `.add_` [`ErrorDetails`] methods.
     /// # Examples
     ///
     /// ```
@@ -642,8 +642,8 @@ impl ErrorDetails {
         self
     }
 
-    /// Returns `true` if `BadRequest` is set and its `field_violations` vector
-    /// is not empty, otherwise returns `false`.
+    /// Returns `true` if [`BadRequest`] is set and its `field_violations`
+    /// vector is not empty, otherwise returns `false`.
     /// # Examples
     ///
     /// ```
@@ -664,8 +664,8 @@ impl ErrorDetails {
         false
     }
 
-    /// Set `RequestInfo` details. Can be chained with other `.set_` and
-    /// `.add_` methods.
+    /// Set [`RequestInfo`] details. Can be chained with other `.set_` and
+    /// `.add_` [`ErrorDetails`] methods.
     /// # Examples
     ///
     /// ```
@@ -684,8 +684,8 @@ impl ErrorDetails {
         self
     }
 
-    /// Set `ResourceInfo` details. Can be chained with other `.set_` and
-    /// `.add_` methods.
+    /// Set [`ResourceInfo`] details. Can be chained with other `.set_` and
+    /// `.add_` [`ErrorDetails`] methods.
     /// # Examples
     ///
     /// ```
@@ -711,8 +711,8 @@ impl ErrorDetails {
         self
     }
 
-    /// Set `Help` details. Can be chained with other `.set_` and `.add_`
-    /// methods.
+    /// Set [`Help`] details. Can be chained with other `.set_` and `.add_`
+    /// [`ErrorDetails`] methods.
     /// # Examples
     ///
     /// ```
@@ -730,8 +730,9 @@ impl ErrorDetails {
         self
     }
 
-    /// Adds a `HelpLink` to `Help` details. Sets `Help` if it is not set yet.
-    /// Can be chained with other `.set_` and `.add_` methods.
+    /// Adds a [`HelpLink`] to [`Help`] details. Sets [`Help`] details if it is
+    /// not set yet. Can be chained with other `.set_` and `.add_`
+    /// [`ErrorDetails`] methods.
     /// # Examples
     ///
     /// ```
@@ -757,7 +758,7 @@ impl ErrorDetails {
         self
     }
 
-    /// Returns `true` if `Help` is set and its `links` vector is not empty,
+    /// Returns `true` if [`Help`] is set and its `links` vector is not empty,
     /// otherwise returns `false`.
     /// # Examples
     ///
@@ -779,8 +780,8 @@ impl ErrorDetails {
         false
     }
 
-    /// Set `LocalizedMessage` details. Can be chained with other `.set_` and
-    /// `.add_` methods.
+    /// Set [`LocalizedMessage`] details. Can be chained with other `.set_` and
+    /// `.add_` [`ErrorDetails`] methods.
     /// # Examples
     ///
     /// ```

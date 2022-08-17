@@ -5,8 +5,6 @@ use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
 /// Used at the `links` field of the [`Help`] struct. Describes a URL link.
-///
-/// [`Help`]: struct.Help.html
 #[derive(Clone, Debug)]
 pub struct HelpLink {
     /// Description of what the link offers.
@@ -17,7 +15,7 @@ pub struct HelpLink {
 }
 
 impl HelpLink {
-    /// Creates a new `HelpLink` struct.
+    /// Creates a new [`HelpLink`] struct.
     pub fn new(description: impl Into<String>, url: impl Into<String>) -> Self {
         HelpLink {
             description: description.into(),
@@ -41,12 +39,12 @@ impl Help {
     /// Type URL of the `Help` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.Help";
 
-    /// Creates a new `Help` struct.
+    /// Creates a new [`Help`] struct.
     pub fn new(links: Vec<HelpLink>) -> Self {
         Help { links }
     }
 
-    /// Creates a new `Help` struct with a single `HelpLink`.
+    /// Creates a new [`Help`] struct with a single [`HelpLink`] in `links`.
     pub fn with_link(description: impl Into<String>, url: impl Into<String>) -> Self {
         Help {
             links: vec![HelpLink {
@@ -58,7 +56,7 @@ impl Help {
 }
 
 impl Help {
-    /// Adds a `HelpLink` to `Help`.
+    /// Adds a [`HelpLink`] to [`Help`]'s `links` vector.
     pub fn add_link(
         &mut self,
         description: impl Into<String>,
@@ -71,8 +69,8 @@ impl Help {
         self
     }
 
-    /// Returns `true` if `Help` does not contain any `HelpLink`, and `false`
-    /// if it does.
+    /// Returns `true` if [`Help`]'s `links` vector is empty, and `false` if it
+    /// is not.
     pub fn is_empty(&self) -> bool {
         self.links.is_empty()
     }

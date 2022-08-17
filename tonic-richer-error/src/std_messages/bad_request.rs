@@ -4,10 +4,8 @@ use prost_types::Any;
 use super::super::pb;
 use super::super::{FromAny, IntoAny};
 
-/// Used at the `field_violations` field of the [`BadRequest`] struct. Describes
-/// a single bad request field.
-///
-/// [`BadRequest`]: struct.BadRequest.html
+/// Used at the `field_violations` field of the [`BadRequest`] struct.
+/// Describes a single bad request field.
 #[derive(Clone, Debug)]
 pub struct FieldViolation {
     /// Path leading to a field in the request body. Value should be a
@@ -20,7 +18,7 @@ pub struct FieldViolation {
 }
 
 impl FieldViolation {
-    /// Creates a new `FieldViolation` struct.
+    /// Creates a new [`FieldViolation`] struct.
     pub fn new(field: impl Into<String>, description: impl Into<String>) -> Self {
         FieldViolation {
             field: field.into(),
@@ -44,12 +42,13 @@ impl BadRequest {
     /// Type URL of the `BadRequest` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.BadRequest";
 
-    /// Creates a new `BadRequest` struct.
+    /// Creates a new [`BadRequest`] struct.
     pub fn new(field_violations: Vec<FieldViolation>) -> Self {
         BadRequest { field_violations }
     }
 
-    /// Creates a new `BadRequest` struct with a single `FieldViolation`.
+    /// Creates a new [`BadRequest`] struct with a single [`FieldViolation`] in
+    /// `field_violations`.
     pub fn with_violation(field: impl Into<String>, description: impl Into<String>) -> Self {
         BadRequest {
             field_violations: vec![FieldViolation {
@@ -61,7 +60,7 @@ impl BadRequest {
 }
 
 impl BadRequest {
-    /// Adds a `FieldViolation` to `BadRequest`.
+    /// Adds a [`FieldViolation`] to [`BadRequest`]'s `field_violations`.
     pub fn add_violation(
         &mut self,
         field: impl Into<String>,
@@ -74,8 +73,8 @@ impl BadRequest {
         self
     }
 
-    /// Returns `true` if `BadRequest` does not contain any `FieldViolation`,
-    /// and `false` if it does.
+    /// Returns `true` if [`BadRequest`]'s `field_violations` vector is empty,
+    /// and `false` if it is not.
     pub fn is_empty(&self) -> bool {
         self.field_violations.is_empty()
     }

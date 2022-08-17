@@ -1,16 +1,16 @@
 /*!
 Assets for implementation of the gRPC Richer Error Model with tonic.
 
-This crate introduces the `WithErrorDetails` trait and implements it in
-`tonic::Status`, allowing the implementation of the [gRPC Richer Error Model]
+This crate introduces the [`WithErrorDetails`] trait and implements it in
+[`tonic::Status`], allowing the implementation of the [gRPC Richer Error Model]
 with [tonic] in a convenient way.
 
 # Usage
-The `WithErrorDetails` trait adds associated functions to `tonic::Status` that
-can be used on the server side to create a status with error details, that can
-then be returned to the gRPC client. Moreover, the trait also adds methods
-to `tonic::Status` that can be used by a tonic client to extract error details,
-and handle them with ease.
+The [`WithErrorDetails`] trait adds associated functions to [`tonic::Status`]
+that can be used on the server side to create a status with error details, that
+can then be returned to the gRPC client. Moreover, the trait also adds methods
+to [`tonic::Status`] that can be used by a tonic client to extract error
+details, and handle them with ease.
 
 # Getting Started
 ```toml
@@ -23,7 +23,7 @@ tonic-richer-error = "0.2"
 The examples bellow cover a basic use case. More complete server and client
 implementations can be found at the [github examples] directory.
 
-## Server Side: Generating `tonic::Status` with an `ErrorDetails` struct
+## Server Side: Generating [`tonic::Status`] with an [`ErrorDetails`] struct
 ```
 use tonic::{Code, Status};
 use tonic_richer_error::{ErrorDetails, WithErrorDetails};
@@ -73,17 +73,17 @@ if err_details.has_bad_request_violations() {
 // ...
 ```
 
-## Client Side: Extracting an `ErrorDetails` struct from `tonic::Status`
+## Client Side: Extracting an [`ErrorDetails`] struct from `tonic::Status`
 ```
 use tonic::{Response, Status};
 use tonic_richer_error::{WithErrorDetails};
 
 // ...
 
-// Where req_result was returned by a tonic::Client endpoint method
+// Where req_result was returned by a gRPC client endpoint method
 fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     match req_result {
-        Ok(_) => {
+        Ok(response) => {
             // Handle successful response
         },
         Err(status) => {
@@ -109,30 +109,26 @@ provided at [error_details.proto].
 
 ## Alternative `tonic::Status` associated functions and methods
 In the [`WithErrorDetails`] doc, an alternative way of interacting with
-`tonic::Status` is presented, using vectors of error details structs wrapped
+[`tonic::Status`] is presented, using vectors of error details structs wrapped
 with the [`ErrorDetail`] enum. This approach can provide more control over the
 vector of standard error messages that will be generated or that was received,
-if necessary. To see how to adopt this approach, please check
-the [`::with_error_details_vec`] and [`.get_error_details_vec`] docs, and also
-the [github examples] directory.\
+if necessary. To see how to adopt this approach, please check the
+[`WithErrorDetails::with_error_details_vec`] and
+[`WithErrorDetails::get_error_details_vec`] docs, and also the
+[github examples] directory.\
 
 Besides that, multiple examples with alternative error details extration
 methods are provided in the [`WithErrorDetails`] doc, which can be specially
 useful if only one type of standard error message is being handled by the
-client. For example, using [`.get_details_bad_request`] is a more direct way of
-extracting a [`BadRequest`] error message from `tonic::Status`.
+client. For example, using [`WithErrorDetails::get_details_bad_request`] is a
+more direct way of extracting a [`BadRequest`] error message from
+[`tonic::Status`].
 
+[`tonic::Status`]: https://docs.rs/tonic/0.8.0/tonic/struct.Status.html
+[tonic]: https://docs.rs/tonic/0.8.0/tonic/
 [gRPC Richer Error Model]: https://www.grpc.io/docs/guides/error/
-[tonic]: https://docs.rs/tonic/latest/tonic/
 [github examples]: https://github.com/flemosr/tonic-richer-error/tree/main/examples
 [error_details.proto]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
-[`ErrorDetails`]: struct.ErrorDetails.html
-[`WithErrorDetails`]: trait.WithErrorDetails.html
-[`ErrorDetail`]: enum.ErrorDetail.html
-[`::with_error_details_vec`]: trait.WithErrorDetails.html#tymethod.with_error_details_vec
-[`.get_error_details_vec`]: trait.WithErrorDetails.html#tymethod.get_error_details_vec
-[`.get_details_bad_request`]: trait.WithErrorDetails.html#tymethod.get_details_bad_request
-[`BadRequest`]: struct.BadRequest.html
 */
 
 #![warn(
@@ -175,7 +171,7 @@ trait FromAny {
 /// allow the addition and extraction of standard error details.
 pub trait WithErrorDetails {
     /// Generates a `tonic::Status` with error details obtained from an
-    /// `ErrorDetails` struct.
+    /// [`ErrorDetails`] struct.
     /// # Examples
     ///
     /// ```
@@ -196,7 +192,7 @@ pub trait WithErrorDetails {
     ) -> Result<Status, EncodeError>;
 
     /// Generates a `tonic::Status` with error details provided in a vector of
-    /// `ErrorDetail` enums.
+    /// [`ErrorDetail`] enums.
     /// # Examples
     ///
     /// ```
@@ -218,7 +214,7 @@ pub trait WithErrorDetails {
         details: Vec<ErrorDetail>,
     ) -> Result<Status, EncodeError>;
 
-    /// Get an `ErrorDetails` struct from a `tonic::Status`.
+    /// Get an [`ErrorDetails`] struct from a `tonic::Status`.
     /// # Examples
     ///
     /// ```
@@ -239,7 +235,7 @@ pub trait WithErrorDetails {
     /// ```
     fn get_error_details(&self) -> Result<ErrorDetails, DecodeError>;
 
-    /// Get a vector of `ErrorDetail` enums from a `tonic::Status`.
+    /// Get a vector of [`ErrorDetail`] enums from a `tonic::Status`.
     /// # Examples
     ///
     /// ```
@@ -265,7 +261,7 @@ pub trait WithErrorDetails {
     /// ```
     fn get_error_details_vec(&self) -> Result<Vec<ErrorDetail>, DecodeError>;
 
-    /// Get first `RetryInfo` details found on a `tonic::Status`.
+    /// Get first [`RetryInfo`] details found on a `tonic::Status`, if any.
     /// # Examples
     ///
     /// ```
@@ -285,7 +281,7 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_retry_info(&self) -> Option<RetryInfo>;
 
-    /// Get first `DebugInfo` details found on a `tonic::Status`.
+    /// Get first [`DebugInfo`] details found on a `tonic::Status`, if any.
     /// # Examples
     ///
     /// ```
@@ -305,7 +301,7 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_debug_info(&self) -> Option<DebugInfo>;
 
-    /// Get first `QuotaFailure` details found on a `tonic::Status`.
+    /// Get first [`QuotaFailure`] details found on a `tonic::Status`, if any.
     /// # Examples
     ///
     /// ```
@@ -325,7 +321,7 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_quota_failure(&self) -> Option<QuotaFailure>;
 
-    /// Get first `ErrorInfo` details found on a `tonic::Status`.
+    /// Get first [`ErrorInfo`] details found on a `tonic::Status`, if any.
     /// # Examples
     ///
     /// ```
@@ -345,7 +341,8 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_error_info(&self) -> Option<ErrorInfo>;
 
-    /// Get first `PreconditionFailure` details found on a `tonic::Status`.
+    /// Get first [`PreconditionFailure`] details found on a `tonic::Status`,
+    /// if any.
     /// # Examples
     ///
     /// ```
@@ -365,7 +362,7 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_precondition_failure(&self) -> Option<PreconditionFailure>;
 
-    /// Get first `BadRequest` details found on a `tonic::Status`.
+    /// Get first [`BadRequest`] details found on a `tonic::Status`, if any.
     /// # Examples
     ///
     /// ```
@@ -385,7 +382,7 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_bad_request(&self) -> Option<BadRequest>;
 
-    /// Get first `RequestInfo` details found on a `tonic::Status`.
+    /// Get first [`RequestInfo`] details found on a `tonic::Status`, if any.
     /// # Examples
     ///
     /// ```
@@ -405,7 +402,7 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_request_info(&self) -> Option<RequestInfo>;
 
-    /// Get first `ResourceInfo` details found on a `tonic::Status`.
+    /// Get first [`ResourceInfo`] details found on a `tonic::Status`, if any.
     /// # Examples
     ///
     /// ```
@@ -425,7 +422,7 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_resource_info(&self) -> Option<ResourceInfo>;
 
-    /// Get first `Help` details found on a `tonic::Status`
+    /// Get first [`Help`] details found on a `tonic::Status`, if any.
     /// # Examples
     ///
     /// ```
@@ -445,7 +442,8 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_help(&self) -> Option<Help>;
 
-    /// Get first `LocalizedMessage` details found on a `tonic::Status`.
+    /// Get first [`LocalizedMessage`] details found on a `tonic::Status`, if
+    /// any.
     /// # Examples
     ///
     /// ```

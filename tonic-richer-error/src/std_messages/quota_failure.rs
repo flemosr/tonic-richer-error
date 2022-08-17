@@ -6,8 +6,6 @@ use super::super::{FromAny, IntoAny};
 
 /// Used at the `violations` field of the [`QuotaFailure`] struct. Describes a
 /// single quota violation.
-///
-/// [`QuotaFailure`]: struct.QuotaFailure.html
 #[derive(Clone, Debug)]
 pub struct QuotaViolation {
     /// Subject on which the quota check failed.
@@ -18,7 +16,7 @@ pub struct QuotaViolation {
 }
 
 impl QuotaViolation {
-    /// Creates a new `QuotaViolation` struct.
+    /// Creates a new [`QuotaViolation`] struct.
     pub fn new(subject: impl Into<String>, description: impl Into<String>) -> Self {
         QuotaViolation {
             subject: subject.into(),
@@ -41,14 +39,15 @@ impl QuotaFailure {
     /// Type URL of the `QuotaFailure` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.QuotaFailure";
 
-    /// Creates a new `QuotaFailure` struct.
+    /// Creates a new [`QuotaFailure`] struct.
     pub fn new(violations: Vec<QuotaViolation>) -> Self {
         QuotaFailure {
             violations: violations,
         }
     }
 
-    /// Creates a new `QuotaFailure` struct with a single `QuotaViolation`.
+    /// Creates a new [`QuotaFailure`] struct with a single [`QuotaViolation`]
+    /// in `violations`.
     pub fn with_violation(subject: impl Into<String>, description: impl Into<String>) -> Self {
         QuotaFailure {
             violations: vec![QuotaViolation {
@@ -60,7 +59,7 @@ impl QuotaFailure {
 }
 
 impl QuotaFailure {
-    /// Adds a `QuotaViolation` to `QuotaFailure`.
+    /// Adds a [`QuotaViolation`] to [`QuotaFailure`]'s `violations`.
     pub fn add_violation(
         &mut self,
         subject: impl Into<String>,
@@ -73,8 +72,8 @@ impl QuotaFailure {
         self
     }
 
-    /// Returns `true` if `QuotaFailure` does not contain any `QuotaViolation`,
-    /// and `false` if it does.
+    /// Returns `true` if [`QuotaFailure`]'s `violations` vector is empty, and
+    /// `false` if it is not.
     pub fn is_empty(&self) -> bool {
         self.violations.is_empty()
     }

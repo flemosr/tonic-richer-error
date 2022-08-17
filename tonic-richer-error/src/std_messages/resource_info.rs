@@ -27,7 +27,7 @@ impl ResourceInfo {
     /// Type URL of the `ResourceInfo` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.ResourceInfo";
 
-    /// Creates a new `ResourceInfo` struct.
+    /// Creates a new [`ResourceInfo`] struct.
     pub fn new(
         resource_type: impl Into<String>,
         resource_name: impl Into<String>,
@@ -44,8 +44,8 @@ impl ResourceInfo {
 }
 
 impl ResourceInfo {
-    /// Returns `true` if `ResourceInfo` fields are empty, and `false` if they
-    /// are not.
+    /// Returns `true` if [`ResourceInfo`] fields are empty, and `false` if
+    /// they are not.
     pub fn is_empty(&self) -> bool {
         self.resource_type.is_empty()
             && self.resource_name.is_empty()

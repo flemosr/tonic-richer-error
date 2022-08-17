@@ -24,7 +24,7 @@ impl RequestInfo {
     /// Type URL of the `RequestInfo` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.RequestInfo";
 
-    /// Creates a new `RequestInfo` struct.
+    /// Creates a new [`RequestInfo`] struct.
     pub fn new(request_id: impl Into<String>, serving_data: impl Into<String>) -> Self {
         RequestInfo {
             request_id: request_id.into(),
@@ -34,7 +34,7 @@ impl RequestInfo {
 }
 
 impl RequestInfo {
-    /// Returns `true` if `RequestInfo` fields are empty, and `false` if they
+    /// Returns `true` if [`RequestInfo`] fields are empty, and `false` if they
     /// are not.
     pub fn is_empty(&self) -> bool {
         self.request_id.is_empty() && self.serving_data.is_empty()

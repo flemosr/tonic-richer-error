@@ -25,7 +25,7 @@ impl LocalizedMessage {
     /// Type URL of the `LocalizedMessage` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.LocalizedMessage";
 
-    /// Creates a new `LocalizedMessage` struct.
+    /// Creates a new [`LocalizedMessage`] struct.
     pub fn new(locale: impl Into<String>, message: impl Into<String>) -> Self {
         LocalizedMessage {
             locale: locale.into(),
@@ -35,7 +35,7 @@ impl LocalizedMessage {
 }
 
 impl LocalizedMessage {
-    /// Returns `true` if `LocalizedMessage` fields are empty, and `false` if
+    /// Returns `true` if [`LocalizedMessage`] fields are empty, and `false` if
     /// they are not.
     pub fn is_empty(&self) -> bool {
         self.locale.is_empty() && self.message.is_empty()

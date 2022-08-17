@@ -4,34 +4,34 @@ use super::std_messages::*;
 /// the implementation and handling of vectors containing any of them.
 #[derive(Clone, Debug)]
 pub enum ErrorDetail {
-    /// Wraps data corresponding to the `RetryInfo` standard error message.
+    /// Wraps the [`RetryInfo`] struct.
     RetryInfo(RetryInfo),
 
-    /// Wraps data corresponding to the `DebugInfo` standard error message.
+    /// Wraps the [`DebugInfo`] struct.
     DebugInfo(DebugInfo),
 
-    /// Wraps data corresponding to the `QuotaFailure` standard error message.
+    /// Wraps the [`QuotaFailure`] struct.
     QuotaFailure(QuotaFailure),
 
-    /// Wraps data corresponding to the `ErrorInfo` standard error message.
+    /// Wraps the [`ErrorInfo`] struct.
     ErrorInfo(ErrorInfo),
 
-    /// Wraps data corresponding to the `PreconditionFailure` standard error message.
+    /// Wraps the [`PreconditionFailure`] struct.
     PreconditionFailure(PreconditionFailure),
 
-    /// Wraps data corresponding to the `BadRequest` standard error message.
+    /// Wraps the [`BadRequest`] struct.
     BadRequest(BadRequest),
 
-    /// Wraps data corresponding to the `RequestInfo` standard error message.
+    /// Wraps the [`RequestInfo`] struct.
     RequestInfo(RequestInfo),
 
-    /// Wraps data corresponding to the `ResourceInfo` standard error message.
+    /// Wraps the [`ResourceInfo`] struct.
     ResourceInfo(ResourceInfo),
 
-    /// Wraps data corresponding to the `Help` standard error message.
+    /// Wraps the [`Help`] struct.
     Help(Help),
 
-    /// Wraps data corresponding to the `LocalizedMessage` standard error message.
+    /// Wraps the [`LocalizedMessage`] struct.
     LocalizedMessage(LocalizedMessage),
 }
 

@@ -32,7 +32,7 @@ impl ErrorInfo {
     /// Type URL of the `ErrorInfo` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.ErrorInfo";
 
-    /// Creates a new `ErrorInfo` struct.
+    /// Creates a new [`ErrorInfo`] struct.
     pub fn new(
         reason: impl Into<String>,
         domain: impl Into<String>,
@@ -47,7 +47,7 @@ impl ErrorInfo {
 }
 
 impl ErrorInfo {
-    /// Returns `true` if `ErrorInfo` fields are empty, and `false` if they
+    /// Returns `true` if [`ErrorInfo`] fields are empty, and `false` if they
     /// are not.
     pub fn is_empty(&self) -> bool {
         self.reason.is_empty() && self.domain.is_empty() && self.metadata.is_empty()

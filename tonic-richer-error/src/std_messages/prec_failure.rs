@@ -6,8 +6,6 @@ use super::super::{FromAny, IntoAny};
 
 /// Used at the `violations` field of the [`PreconditionFailure`] struct.
 /// Describes a single precondition failure.
-///
-/// [`PreconditionFailure`]: struct.PreconditionFailure.html
 #[derive(Clone, Debug)]
 pub struct PreconditionViolation {
     /// Type of the PreconditionFailure. At [error_details.proto], the usage
@@ -25,7 +23,7 @@ pub struct PreconditionViolation {
 }
 
 impl PreconditionViolation {
-    /// Creates a new `PreconditionViolation` struct.
+    /// Creates a new [`PreconditionViolation`] struct.
     pub fn new(
         r#type: impl Into<String>,
         subject: impl Into<String>,
@@ -54,15 +52,15 @@ impl PreconditionFailure {
     /// Type URL of the `PreconditionFailure` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.PreconditionFailure";
 
-    /// Creates a new `PreconditionFailure` struct.
+    /// Creates a new [`PreconditionFailure`] struct.
     pub fn new(violations: Vec<PreconditionViolation>) -> Self {
         PreconditionFailure {
             violations: violations,
         }
     }
 
-    /// Creates a new `PreconditionFailure` struct with a single
-    /// `PreconditionViolation`.
+    /// Creates a new [`PreconditionFailure`] struct with a single
+    /// [`PreconditionViolation`] in `violations`.
     pub fn with_violation(
         violation_type: impl Into<String>,
         subject: impl Into<String>,
@@ -79,7 +77,8 @@ impl PreconditionFailure {
 }
 
 impl PreconditionFailure {
-    /// Adds a `PreconditionViolation` to `PreconditionFailure`.
+    /// Adds a [`PreconditionViolation`] to [`PreconditionFailure`]'s
+    /// `violations` vector.
     pub fn add_violation(
         &mut self,
         r#type: impl Into<String>,
@@ -94,8 +93,8 @@ impl PreconditionFailure {
         self
     }
 
-    /// Returns `true` if `PreconditionFailure` does not contain any
-    /// `PreconditionViolation`, and `false` if it does.
+    /// Returns `true` if [`PreconditionFailure`]'s `violations` vector is
+    /// empty, and `false` if it is not.
     pub fn is_empty(&self) -> bool {
         self.violations.is_empty()
     }

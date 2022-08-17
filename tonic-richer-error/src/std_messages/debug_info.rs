@@ -21,7 +21,7 @@ impl DebugInfo {
     /// Type URL of the `DebugInfo` standard error message type.
     pub const TYPE_URL: &'static str = "type.googleapis.com/google.rpc.DebugInfo";
 
-    /// Creates a new `DebugInfo` struct.
+    /// Creates a new [`DebugInfo`] struct.
     pub fn new(stack_entries: Vec<String>, detail: impl Into<String>) -> Self {
         DebugInfo {
             stack_entries: stack_entries,
@@ -31,7 +31,7 @@ impl DebugInfo {
 }
 
 impl DebugInfo {
-    /// Returns `true` if `DebugInfo` fields are empty, and `false` if they
+    /// Returns `true` if [`DebugInfo`] fields are empty, and `false` if they
     /// are not.
     pub fn is_empty(&self) -> bool {
         self.stack_entries.is_empty() && self.detail.is_empty()
