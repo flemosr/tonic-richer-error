@@ -22,7 +22,7 @@ details, and handle them with ease.
 ```
 [dependencies]
 tonic = "0.8"
-tonic-richer-error = "0.2"
+tonic-richer-error = "0.3"
 ```
 
 ## Examples
@@ -144,13 +144,13 @@ conditions.
 [gRPC Richer Error Model]: https://www.grpc.io/docs/guides/error/
 [Examples]: https://github.com/flemosr/tonic-richer-error/tree/main/examples
 [Website]: https://github.com/flemosr/tonic-richer-error
-[Docs]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/
+[Docs]: https://docs.rs/tonic-richer-error/0.3.0/tonic_richer_error/
 [examples]: https://github.com/flemosr/tonic-richer-error/tree/main/examples
 [error_details.proto]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
-[`ErrorDetails`]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/struct.ErrorDetails.html
-[`WithErrorDetails`]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/trait.WithErrorDetails.html
-[`ErrorDetail`]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/enum.ErrorDetail.html
-[`WithErrorDetails::with_error_details_vec`]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/trait.WithErrorDetails.html#tymethod.with_error_details_vec
-[`WithErrorDetails::get_error_details_vec`]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/trait.WithErrorDetails.html#tymethod.get_error_details_vec
-[`WithErrorDetails::get_details_bad_request`]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/trait.WithErrorDetails.html#tymethod.get_details_bad_request
-[`BadRequest`]: https://docs.rs/tonic-richer-error/0.2.1/tonic_richer_error/struct.BadRequest.html
+[`ErrorDetails`]: https://docs.rs/tonic-richer-error/0.3.0/tonic_richer_error/struct.ErrorDetails.html
+[`WithErrorDetails`]: https://docs.rs/tonic-richer-error/0.3.0/tonic_richer_error/trait.WithErrorDetails.html
+[`ErrorDetail`]: https://docs.rs/tonic-richer-error/0.3.0/tonic_richer_error/enum.ErrorDetail.html
+[`WithErrorDetails::with_error_details_vec`]: https://docs.rs/tonic-richer-error/0.3.0/tonic_richer_error/trait.WithErrorDetails.html#tymethod.with_error_details_vec
+[`WithErrorDetails::get_error_details_vec`]: https://docs.rs/tonic-richer-error/0.3.0/tonic_richer_error/trait.WithErrorDetails.html#tymethod.get_error_details_vec
+[`WithErrorDetails::get_details_bad_request`]: https://docs.rs/tonic-richer-error/0.3.0/tonic_richer_error/trait.WithErrorDetails.html#tymethod.get_details_bad_request
+[`BadRequest`]: https://docs.rs/tonic-richer-error/0.3.0/tonic_richer_error/struct.BadRequest.html
