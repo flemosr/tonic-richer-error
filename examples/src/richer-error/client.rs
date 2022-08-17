@@ -25,7 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Err(status) => {
             println!(" Error status received. Extracting error details...\n");
 
-            let err_details = status.get_error_details().unwrap();
+            let err_details = status.get_error_details();
 
             if let Some(bad_request) = err_details.bad_request {
                 // Handle bad_request details

@@ -25,7 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Err(status) => {
             println!(" Error status received. Extracting error details...\n");
 
-            let err_details = status.get_error_details_vec().unwrap();
+            let err_details = status.get_error_details_vec();
 
             for (i, err_detail) in err_details.iter().enumerate() {
                 println!("err_detail[{i}]");

@@ -211,7 +211,12 @@ pub trait WithErrorDetails {
         details: Vec<ErrorDetail>,
     ) -> Status;
 
-    /// Get an [`ErrorDetails`] struct from a `tonic::Status`.
+    /// Can be used to check if the error details contained in `tonic::Status`
+    /// are malformed or not. Tries to get an [`ErrorDetails`] struct from a
+    /// `tonic::Status`. If some `prost::DecodeError` occurs, it will be
+    /// returned. If not debugging, consider using
+    /// [`WithErrorDetails::get_error_details`] or
+    /// [`WithErrorDetails::get_error_details_vec`].
     /// # Examples
     ///
     /// ```
@@ -222,17 +227,47 @@ pub trait WithErrorDetails {
     ///     match req_result {
     ///         Ok(_) => {},
     ///         Err(status) => {
-    ///             let err_details = status.get_error_details().unwrap();
+    ///             let err_details = status.get_error_details();
     ///             if let Some(bad_request) = err_details.bad_request {
     ///                 // Handle bad_request details
     ///             }
+    ///             // ...
     ///         }
     ///     };
     /// }
     /// ```
-    fn get_error_details(&self) -> Result<ErrorDetails, DecodeError>;
+    fn check_error_details(&self) -> Result<ErrorDetails, DecodeError>;
 
-    /// Get a vector of [`ErrorDetail`] enums from a `tonic::Status`.
+    /// Get an [`ErrorDetails`] struct from `tonic::Status`. If some
+    /// `prost::DecodeError` occurs, an empty [`ErrorDetails`] struct will be
+    /// returned.
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Status, Response};
+    /// use tonic_richer_error::{WithErrorDetails};
+    ///
+    /// fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
+    ///     match req_result {
+    ///         Ok(_) => {},
+    ///         Err(status) => {
+    ///             let err_details = status.get_error_details();
+    ///             if let Some(bad_request) = err_details.bad_request {
+    ///                 // Handle bad_request details
+    ///             }
+    ///             // ...
+    ///         }
+    ///     };
+    /// }
+    /// ```
+    fn get_error_details(&self) -> ErrorDetails;
+
+    /// Can be used to check if the error details contained in `tonic::Status`
+    /// are malformed or not. Tries to get a vector of [`ErrorDetail`] enums
+    /// from a `tonic::Status`. If some `prost::DecodeError` occurs, it will be
+    /// returned. If not debugging, consider using
+    /// [`WithErrorDetails::get_error_details_vec`] or
+    /// [`WithErrorDetails::get_error_details`].
     /// # Examples
     ///
     /// ```
@@ -243,12 +278,39 @@ pub trait WithErrorDetails {
     ///     match req_result {
     ///         Ok(_) => {},
     ///         Err(status) => {
-    ///             let err_details = status.get_error_details_vec().unwrap();
+    ///             match status.check_error_details_vec() {
+    ///                 Ok(err_details) => {
+    ///                     // Handle extracted details
+    ///                 }
+    ///                 Err(decode_error) => {
+    ///                     // Handle decode_error
+    ///                 }
+    ///             }
+    ///         }
+    ///     };
+    /// }
+    /// ```
+    fn check_error_details_vec(&self) -> Result<Vec<ErrorDetail>, DecodeError>;
+
+    /// Get a vector of [`ErrorDetail`] enums from `tonic::Status`. If some
+    /// `prost::DecodeError` occurs, an empty vector will be returned.
+    /// # Examples
+    ///
+    /// ```
+    /// use tonic::{Status, Response};
+    /// use tonic_richer_error::{ErrorDetail, WithErrorDetails};
+    ///
+    /// fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
+    ///     match req_result {
+    ///         Ok(_) => {},
+    ///         Err(status) => {
+    ///             let err_details = status.get_error_details_vec();
     ///             for err_detail in err_details.iter() {
     ///                  match err_detail {
     ///                     ErrorDetail::BadRequest(bad_request) => {
     ///                         // Handle bad_request details
     ///                     }
+    ///                     // ...
     ///                     _ => {}
     ///                  }
     ///             }
@@ -256,9 +318,10 @@ pub trait WithErrorDetails {
     ///     };
     /// }
     /// ```
-    fn get_error_details_vec(&self) -> Result<Vec<ErrorDetail>, DecodeError>;
+    fn get_error_details_vec(&self) -> Vec<ErrorDetail>;
 
-    /// Get first [`RetryInfo`] details found on a `tonic::Status`, if any.
+    /// Get first [`RetryInfo`] details found on `tonic::Status`, if any. If
+    /// some `prost::DecodeError` occurs, returns `None`.
     /// # Examples
     ///
     /// ```
@@ -278,7 +341,8 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_retry_info(&self) -> Option<RetryInfo>;
 
-    /// Get first [`DebugInfo`] details found on a `tonic::Status`, if any.
+    /// Get first [`DebugInfo`] details found on `tonic::Status`, if any. If
+    /// some `prost::DecodeError` occurs, returns `None`.
     /// # Examples
     ///
     /// ```
@@ -298,7 +362,8 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_debug_info(&self) -> Option<DebugInfo>;
 
-    /// Get first [`QuotaFailure`] details found on a `tonic::Status`, if any.
+    /// Get first [`QuotaFailure`] details found on `tonic::Status`, if any.
+    /// If some `prost::DecodeError` occurs, returns `None`.
     /// # Examples
     ///
     /// ```
@@ -318,7 +383,8 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_quota_failure(&self) -> Option<QuotaFailure>;
 
-    /// Get first [`ErrorInfo`] details found on a `tonic::Status`, if any.
+    /// Get first [`ErrorInfo`] details found on `tonic::Status`, if any. If
+    /// some `prost::DecodeError` occurs, returns `None`.
     /// # Examples
     ///
     /// ```
@@ -338,8 +404,8 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_error_info(&self) -> Option<ErrorInfo>;
 
-    /// Get first [`PreconditionFailure`] details found on a `tonic::Status`,
-    /// if any.
+    /// Get first [`PreconditionFailure`] details found on `tonic::Status`,
+    /// if any. If some `prost::DecodeError` occurs, returns `None`.
     /// # Examples
     ///
     /// ```
@@ -359,7 +425,8 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_precondition_failure(&self) -> Option<PreconditionFailure>;
 
-    /// Get first [`BadRequest`] details found on a `tonic::Status`, if any.
+    /// Get first [`BadRequest`] details found on `tonic::Status`, if any. If
+    /// some `prost::DecodeError` occurs, returns `None`.
     /// # Examples
     ///
     /// ```
@@ -379,7 +446,8 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_bad_request(&self) -> Option<BadRequest>;
 
-    /// Get first [`RequestInfo`] details found on a `tonic::Status`, if any.
+    /// Get first [`RequestInfo`] details found on `tonic::Status`, if any.
+    /// If some `prost::DecodeError` occurs, returns `None`.
     /// # Examples
     ///
     /// ```
@@ -399,7 +467,8 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_request_info(&self) -> Option<RequestInfo>;
 
-    /// Get first [`ResourceInfo`] details found on a `tonic::Status`, if any.
+    /// Get first [`ResourceInfo`] details found on `tonic::Status`, if any.
+    /// If some `prost::DecodeError` occurs, returns `None`.
     /// # Examples
     ///
     /// ```
@@ -419,7 +488,8 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_resource_info(&self) -> Option<ResourceInfo>;
 
-    /// Get first [`Help`] details found on a `tonic::Status`, if any.
+    /// Get first [`Help`] details found on `tonic::Status`, if any. If some
+    /// `prost::DecodeError` occurs, returns `None`.
     /// # Examples
     ///
     /// ```
@@ -439,8 +509,8 @@ pub trait WithErrorDetails {
     /// ```
     fn get_details_help(&self) -> Option<Help>;
 
-    /// Get first [`LocalizedMessage`] details found on a `tonic::Status`, if
-    /// any.
+    /// Get first [`LocalizedMessage`] details found on `tonic::Status`, if
+    /// any. If some `prost::DecodeError` occurs, returns `None`.
     /// # Examples
     ///
     /// ```
@@ -569,7 +639,7 @@ impl WithErrorDetails for Status {
         Status::with_details(code, message, Bytes::from(status.encode_to_vec()))
     }
 
-    fn get_error_details(&self) -> Result<ErrorDetails, DecodeError> {
+    fn check_error_details(&self) -> Result<ErrorDetails, DecodeError> {
         let status = pb::Status::decode(self.details())?;
 
         let mut details = ErrorDetails::new();
@@ -613,7 +683,11 @@ impl WithErrorDetails for Status {
         Ok(details)
     }
 
-    fn get_error_details_vec(&self) -> Result<Vec<ErrorDetail>, DecodeError> {
+    fn get_error_details(&self) -> ErrorDetails {
+        self.check_error_details().unwrap_or(ErrorDetails::new())
+    }
+
+    fn check_error_details_vec(&self) -> Result<Vec<ErrorDetail>, DecodeError> {
         let status = pb::Status::decode(self.details())?;
 
         let mut details: Vec<ErrorDetail> = Vec::with_capacity(status.details.len());
@@ -655,6 +729,10 @@ impl WithErrorDetails for Status {
         }
 
         Ok(details)
+    }
+
+    fn get_error_details_vec(&self) -> Vec<ErrorDetail> {
+        self.check_error_details_vec().unwrap_or(Vec::new())
     }
 
     fn get_details_retry_info(&self) -> Option<RetryInfo> {
@@ -904,7 +982,7 @@ mod tests {
 
         println!("{:?}\n", fmt_status_with_details_vec);
 
-        let ext_details = match status_from_vec.get_error_details() {
+        let ext_details = match status_from_vec.check_error_details() {
             Ok(ext_details) => ext_details,
             Err(err) => panic!(
                 "Error extracting details struct from status_from_vec: {:?}",
@@ -922,7 +1000,7 @@ mod tests {
             "Extracted details struct differs from original details struct"
         );
 
-        let ext_details_vec = match status_from_struct.get_error_details_vec() {
+        let ext_details_vec = match status_from_struct.check_error_details_vec() {
             Ok(ext_details) => ext_details,
             Err(err) => panic!(
                 "Error extracting details_vec from status_from_struct: {:?}",
