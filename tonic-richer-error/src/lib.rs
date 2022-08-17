@@ -3,7 +3,7 @@ Assets for implementation of the gRPC Richer Error Model with tonic.
 
 This crate introduces the [`WithErrorDetails`] trait and implements it in
 [`tonic::Status`], allowing the implementation of the [gRPC Richer Error Model]
-with [tonic] in a convenient way.
+with [`tonic`] in a convenient way.
 
 # Usage
 The [`WithErrorDetails`] trait adds associated functions to [`tonic::Status`]
@@ -29,9 +29,9 @@ use tonic::{Code, Status};
 use tonic_richer_error::{ErrorDetails, WithErrorDetails};
 
 // ...
-// (inside a gRPC server endpoint that returns Result<Response<PbRes>, Status>)
+// Inside a gRPC server endpoint that returns `Result<Response<T>, Status>`
 
-// Create empty ErrorDetails struct
+// Create empty `ErrorDetails` struct
 let mut err_details = ErrorDetails::new();
 
 // Add error details conditionally
@@ -79,14 +79,14 @@ use tonic_richer_error::{WithErrorDetails};
 
 // ...
 
-// Where req_result was returned by a gRPC client endpoint method
+// Where `req_result` was returned by a gRPC client endpoint method
 fn handle_request_result<T>(req_result: Result<Response<T>, Status>) {
     match req_result {
         Ok(response) => {
             // Handle successful response
         },
         Err(status) => {
-            let err_details = status.get_error_details().unwrap();
+            let err_details = status.get_error_details();
             if let Some(bad_request) = err_details.bad_request {
                 // Handle bad_request details
             }
@@ -116,7 +116,7 @@ if necessary. To see how to adopt this approach, please check the
 [`WithErrorDetails::get_error_details_vec`] docs, and also the
 [github examples] directory.\
 
-Besides that, multiple examples with alternative error details extration
+Besides that, multiple examples with alternative error details extraction
 methods are provided in the [`WithErrorDetails`] doc, which can be specially
 useful if only one type of standard error message is being handled by the
 client. For example, using [`WithErrorDetails::get_details_bad_request`] is a
@@ -124,7 +124,7 @@ more direct way of extracting a [`BadRequest`] error message from
 [`tonic::Status`].
 
 [`tonic::Status`]: https://docs.rs/tonic/0.8.0/tonic/struct.Status.html
-[tonic]: https://docs.rs/tonic/0.8.0/tonic/
+[`tonic`]: https://docs.rs/tonic/0.8.0/tonic/
 [gRPC Richer Error Model]: https://www.grpc.io/docs/guides/error/
 [github examples]: https://github.com/flemosr/tonic-richer-error/tree/main/examples
 [error_details.proto]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
@@ -141,7 +141,7 @@ use prost::{DecodeError, Message};
 use prost_types::Any;
 use tonic::{codegen::Bytes, Code, Status};
 
-/// Compiled google.rpc protos
+/// Compiled `google.rpc` protos
 pub mod pb {
     include!(concat!(env!("OUT_DIR"), "/google.rpc.rs"));
 }
