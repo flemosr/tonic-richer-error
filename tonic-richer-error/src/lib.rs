@@ -13,10 +13,13 @@ to [`tonic::Status`] that can be used by a tonic client to extract error
 details, and handle them with ease.
 
 # Getting Started
+To build this crate you must have the Protocol Buffer Compiler, `protoc`,
+installed. Instructions can be found [here][protoc-install].
+
 ```toml
 [dependencies]
 tonic = "0.8"
-tonic-richer-error = "0.2"
+tonic-richer-error = "0.3"
 ```
 
 # Examples
@@ -28,6 +31,7 @@ implementations can be found at the [github examples] directory.
 use tonic::{Code, Status};
 use tonic_richer_error::{ErrorDetails, WithErrorDetails};
 
+# async fn endpoint() -> Result<tonic::Response<()>, Status> {
 // ...
 // Inside a gRPC server endpoint that returns `Result<Response<T>, Status>`
 
@@ -35,14 +39,16 @@ use tonic_richer_error::{ErrorDetails, WithErrorDetails};
 let mut err_details = ErrorDetails::new();
 
 // Add error details conditionally
-if true {
+# let some_condition = true;
+if some_condition {
     err_details.add_bad_request_violation(
         "field_a",
         "description of why the field_a is invalid"
     );
 }
 
-if true {
+# let other_condition = true;
+if other_condition {
     err_details.add_bad_request_violation(
         "field_b",
         "description of why the field_b is invalid",
@@ -63,13 +69,14 @@ if err_details.has_bad_request_violations() {
         err_details,
     );
 
-    // Here the status would be returned. Omitted to avoid breaking tests
-    // return Err(status);
+    return Err(status);
 }
 
 // Handle valid request
-
 // ...
+
+# Ok(tonic::Response::new(()))
+# }
 ```
 
 ## Client Side: Extracting an [`ErrorDetails`] struct from `tonic::Status`
@@ -126,6 +133,7 @@ more direct way of extracting a [`BadRequest`] error message from
 [`tonic::Status`]: https://docs.rs/tonic/0.8.0/tonic/struct.Status.html
 [`tonic`]: https://docs.rs/tonic/0.8.0/tonic/
 [gRPC Richer Error Model]: https://www.grpc.io/docs/guides/error/
+[protoc-install]: https://grpc.io/docs/protoc-installation/
 [github examples]: https://github.com/flemosr/tonic-richer-error/tree/main/examples
 [error_details.proto]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
 */

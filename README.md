@@ -19,6 +19,9 @@ to [`tonic::Status`] that can be used by a tonic client to extract error
 details, and handle them with ease.
 
 ## Getting Started
+To build this crate you must have the Protocol Buffer Compiler, `protoc`,
+installed. Instructions can be found [here][protoc-install].
+
 ```
 [dependencies]
 tonic = "0.8"
@@ -26,7 +29,6 @@ tonic-richer-error = "0.3"
 ```
 
 ## Examples
-
 The examples bellow cover a basic use case. More complete server and client
 implementations can be found at the [examples] directory.
 
@@ -145,6 +147,7 @@ conditions.
 [Examples]: https://github.com/flemosr/tonic-richer-error/tree/main/examples
 [Website]: https://github.com/flemosr/tonic-richer-error
 [Docs]: https://docs.rs/tonic-richer-error/0.3.0/tonic_richer_error/
+[protoc-install]: https://grpc.io/docs/protoc-installation/
 [examples]: https://github.com/flemosr/tonic-richer-error/tree/main/examples
 [error_details.proto]: https://github.com/googleapis/googleapis/blob/master/google/rpc/error_details.proto
 [`ErrorDetails`]: https://docs.rs/tonic-richer-error/0.3.0/tonic_richer_error/struct.ErrorDetails.html
