@@ -1,3 +1,10 @@
+**Important**: This crate's functionality was incorporated into [`tonic-types`]
+and will be actively maintained there. This repository is no longer maintained.  
+
+[`tonic-types`]: https://crates.io/crates/tonic-types
+
+---
+
 # Tonic Richer Error
 Assets for implementation of the gRPC Richer Error Model with tonic.
 
@@ -83,7 +90,7 @@ if err_details.has_bad_request_violations() {
 ### Client Side: Extracting an `ErrorDetails` struct from `tonic::Status`
 ```rust
 use tonic::{Response, Status};
-use tonic_richer_error::{WithErrorDetails};
+use tonic_richer_error::WithErrorDetails;
 
 // ...
 
